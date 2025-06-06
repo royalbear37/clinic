@@ -1,6 +1,6 @@
 clone到之前作業用的AppServ/www資料夾裡面  
 ****
-在瀏覽器輸入localhost/users/login.php進到登入頁面  
+在瀏覽器輸入localhost/clinic/users/login.php進到登入頁面  
 ****
 先用config裡的sql檔建立database  
 ****
