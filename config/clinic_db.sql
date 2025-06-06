@@ -87,3 +87,27 @@ CREATE TABLE feedback (
   submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--醫師排班
+CREATE TABLE schedules (
+    schedule_id INT AUTO_INCREMENT PRIMARY KEY,
+    doctor_id INT NOT NULL,
+    schedule_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    is_available BOOLEAN NOT NULL DEFAULT TRUE,
+    note TEXT,
+    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON DELETE CASCADE
+);ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--通知病患
+CREATE TABLE notifications (
+  notification_id INT AUTO_INCREMENT PRIMARY KEY,
+  appointment_id INT,
+  patient_id INT,
+  type ENUM('email', 'sms', 'line') NOT NULL,
+  message TEXT,
+  sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id),
+  FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -58,7 +58,7 @@ if ($pw && $pw2 && $pw == $pw2) {
         }
 
         if ($role == 'doctor') {
-            $department_id = 101;
+            $department_id = $_POST['department_id'] ?? 101;
             $profile = '暫無簡介';
             $photo_url = 'default.jpg';
             $is_active = 'yes';

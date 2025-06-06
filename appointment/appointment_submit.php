@@ -45,7 +45,7 @@ $row = $result->fetch_assoc();
 
 if ($row['count'] >= $limit) {
     echo "❌ 該時段已達人數上限，請選擇其他時段。";
-    echo "<br><a href='appointment_new.php'>返回預約頁面</a>";
+    echo "<br><a href='new_appointment.php'>返回預約頁面</a>";
     exit();
 }
 
@@ -55,8 +55,15 @@ $insert = $conn->prepare("INSERT INTO appointments (patient_id, doctor_id, appoi
 $insert->bind_param("iisss", $patient_id, $doctor_id, $appointment_date, $time_slot, $service_type);
 
 if ($insert->execute()) {
-    echo "✅ 預約成功！<br><a href='appointment_new.php'>再預約一筆</a> | <a href='appointment_list.php'>查看預約紀錄</a>";
+    echo "✅ 預約成功！<br><a href='new_appointment.php'>再預約一筆</a> | <a href='my_appointment.php'>查看預約紀錄</a>";
 } else {
     echo "❌ 寫入失敗：" . $insert->error;
+}
+?>
+
+<?php
+if (isset($_SESSION['role'])) {
+    $role = $_SESSION['role'];
+    echo "<p><a href='/clinic/{$role}s/dashboard.php'>🔙 回到主頁</a></p>";
 }
 ?>
