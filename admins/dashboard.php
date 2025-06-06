@@ -8,7 +8,7 @@ echo "👩‍💼 歡迎管理員：" . $_SESSION['name'] . "<br>";
     <li><a href="user_management.php">👥 使用者管理</a></li>
     <li><a href="/clinic/schedule/schedule_manage.php">📅 醫師排班設定</a></li>
     <li><a href="/clinic/schedule/schedule_overview.php">🗓️ 排班狀況總覽</a></li>
-    <li><a href="/clinic/schedule/schedule_copy_week.php">📂 複製每週排班</a></li>
+    <li><a href="/clinic/notifications/notifications_generate.php">📂 產生明日預約通知</a></li>
 </ul>
 <h2>📊 管理員報表</h2>
 
