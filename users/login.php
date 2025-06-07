@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../config/mysql_connect.inc.php");
+include("../header.php"); // 新增這行
 
 $error = "";
 
@@ -39,6 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
+<link rel="stylesheet" href="/clinic/style.css">
+
 <h2>診所系統登入</h2>
 
 <?php if (!empty($error)) echo "<p style='color:red; font-weight:bold;'>$error</p>"; ?>
@@ -56,3 +59,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </form>
 
 <p>還沒有帳號？<a href="register.php">註冊</a></p>
+
+<?php include("../footer.php"); // 新增這行 ?>

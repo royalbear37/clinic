@@ -1,3 +1,5 @@
+<?php include("../header.php"); ?>
+
 <h2>註冊新帳號</h2>
 
 <form method="post" action="register_finish.php">
@@ -34,3 +36,5 @@ function toggleDoctorFields() {
     document.getElementById('doctor-fields').style.display = (role === 'doctor') ? 'block' : 'none';
 }
 </script>
+
+<?php include("../footer.php"); ?>

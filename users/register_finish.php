@@ -8,6 +8,7 @@ session_start();
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?php
 include("../config/mysql_connect.inc.php");
+include("../header.php"); // 加在最前面
 
 $pw = $_POST['pw'];
 $pw2 = $_POST['pw2'];
@@ -48,7 +49,7 @@ if ($pw && $pw2 && $pw == $pw2) {
     $stmt->bind_param("ssssss", $user_id, $id_number, $hash_pw, $role, $name, $email);
 
     if ($stmt->execute()) {
-        $uid = $stmt->insert_id;
+        $uid = $stmt->insert_id; // 這是 users.id (int)
 
         if ($role == 'patient') {
             $insert = $conn->prepare("INSERT INTO patients (user_id, id_number) VALUES (?, ?)");
@@ -75,14 +76,16 @@ if ($pw && $pw2 && $pw == $pw2) {
             $insert->execute();
         }
 
-        echo "✅ 註冊成功！系統帳號為：<b>$user_id</b>";
+        echo "<div class='success'>✅ 註冊成功！系統帳號為：<b>$user_id</b></div>";
         echo '<meta http-equiv=REFRESH CONTENT=3;url=login.php>';
     } else {
-        echo '❌ 註冊失敗：' . $stmt->error;
+        echo "<div class='error'>❌ 註冊失敗：" . $stmt->error . "</div>";
         echo '<meta http-equiv=REFRESH CONTENT=3;url=register.php>';
     }
 } else {
-    echo '⚠️ 密碼不一致或欄位缺漏';
+    echo "<div class='error'>⚠️ 密碼不一致或欄位缺漏</div>";
     echo '<meta http-equiv=REFRESH CONTENT=3;url=register.php>';
 }
+
+include("../footer.php"); // 加在最後面
 ?>
