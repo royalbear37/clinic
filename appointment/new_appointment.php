@@ -12,17 +12,32 @@ $departments = $conn->query("SELECT * FROM departments");
 
 // 撈所有啟用醫師（附上科別）
 $doctor_map = [];
-$doctor_sql = "SELECT doctor_id, users.name AS doctor_name, doctors.department_id 
-               FROM doctors 
-               JOIN users ON doctors.user_id = users.id 
-               WHERE is_active = 'yes'";
+$doctor_sql = "
+SELECT 
+    d.doctor_id, 
+    u.name AS doctor_name, 
+    d.department_id,
+    ROUND(AVG(f.rating), 1) AS avg_rating,
+    GROUP_CONCAT(f.comment SEPARATOR '||') AS comments
+FROM doctors d
+JOIN users u ON d.user_id = u.id
+LEFT JOIN appointments a ON d.doctor_id = a.doctor_id AND a.status = 'completed'
+LEFT JOIN feedback f ON f.appointment_id = a.appointment_id
+WHERE d.is_active = 'yes'
+GROUP BY d.doctor_id, u.name, d.department_id
+";
+
 $result = $conn->query($doctor_sql);
 while ($row = $result->fetch_assoc()) {
     $doctor_map[$row['department_id']][] = $row;
+    $comments = array_filter(explode('||', $row['comments'] ?? ''));
+    $row['avg_rating'] = is_null($row['avg_rating']) ? '尚無評價' : $row['avg_rating'];
+    $row['comments_array'] = $comments ?: ['尚無留言'];
 }
 
 // 建立時間區間（09:00~21:00，每 30 分鐘）
-function generateTimeSlots() {
+function generateTimeSlots()
+{
     $ranges = [
         ["09:00", "12:00"],  // 早班
         ["13:00", "17:00"],  // 中班
@@ -90,6 +105,15 @@ $time_slots = generateTimeSlots();
         </div>
         <button type="submit" class="button">送出預約</button>
     </form>
+    <!-- 顯示醫師評價區塊 -->
+    <div id="doctor-info" style="margin-top: 15px; border: 1px solid #ccc; padding: 10px; display: none;">
+        <h4 id="avg-rating">⭐ 平均評分：</h4>
+        <div><strong>留言：</strong></div>
+        <ul id="comment-list"></ul>
+        <button id="toggle-comments-btn" style="display:none; margin-top: 8px;">查看更多留言 ▼</button>
+    </div>
+
+
     <div style="text-align:center; margin-top:2em;">
         <a href="/clinic/schedule/schedule_overview.php" class="button" style="max-width:200px;">📅 查看醫師班表</a>
         <?php if (isset($_SESSION['role'])): ?>
@@ -98,54 +122,83 @@ $time_slots = generateTimeSlots();
     </div>
 </div>
 <script>
-// 根據時段取得 shift
-function getShiftByTimeSlot(slot) {
-    // slot 格式 "09:00-09:30"
-    const start = slot.split('-')[0];
-    if (start >= "09:00" && start < "12:00") return "morning";
-    if (start >= "13:00" && start < "17:00") return "afternoon";
-    if (start >= "18:00" && start < "21:00") return "evening";
-    return "";
-}
-
-function fetchDoctors() {
-    const dept = document.getElementById("dept_select").value;
-    const date = document.querySelector("input[name='appointment_date']").value;
-    const slot = document.getElementById("time_slot_select").value;
-    const shift = getShiftByTimeSlot(slot);
-    const select = document.getElementById("doctor_select");
-    select.innerHTML = "<option disabled>載入中...</option>";
-
-    if (!date || !shift) {
-        select.innerHTML = "<option disabled selected>請先選擇日期與時段</option>";
-        return;
+    // 根據時段取得 shift
+    function getShiftByTimeSlot(slot) {
+        // slot 格式 "09:00-09:30"
+        const start = slot.split('-')[0];
+        if (start >= "09:00" && start < "12:00") return "morning";
+        if (start >= "13:00" && start < "17:00") return "afternoon";
+        if (start >= "18:00" && start < "21:00") return "evening";
+        return "";
     }
 
-    fetch(`get_doctors_by_schedule.php?department_id=${dept}&appointment_date=${date}&shift=${shift}`)
-        .then(res => res.json())
-        .then(data => {
-            select.innerHTML = "";
-            if (data.length === 0) {
-                const opt = document.createElement("option");
-                opt.disabled = true;
-                opt.selected = true;
-                opt.text = "此日無醫師排班";
-                select.appendChild(opt);
-            } else {
-                data.forEach(d => {
-                    const opt = document.createElement("option");
-                    opt.value = d.doctor_id;
-                    opt.text = d.doctor_name;
-                    select.appendChild(opt);
-                });
-            }
-        });
-}
+    function fetchDoctors() {
+        const dept = document.getElementById("dept_select").value;
+        const date = document.querySelector("input[name='appointment_date']").value;
+        const slot = document.getElementById("time_slot_select").value;
+        const shift = getShiftByTimeSlot(slot);
+        const select = document.getElementById("doctor_select");
+        select.innerHTML = "<option disabled>載入中...</option>";
 
-document.getElementById("dept_select").addEventListener("change", fetchDoctors);
-document.querySelector("input[name='appointment_date']").addEventListener("change", fetchDoctors);
-document.getElementById("time_slot_select").addEventListener("change", fetchDoctors);
-window.addEventListener("load", fetchDoctors);
+        if (!date || !shift) {
+            select.innerHTML = "<option disabled selected>請先選擇日期與時段</option>";
+            return;
+        }
+
+        fetch(`get_doctors_by_schedule.php?department_id=${dept}&appointment_date=${date}&shift=${shift}`)
+            .then(res => res.json())
+            .then(data => {
+                select.innerHTML = "";
+                if (data.length === 0) {
+                    const opt = document.createElement("option");
+                    opt.disabled = true;
+                    opt.selected = true;
+                    opt.text = "此日無醫師排班";
+                    select.appendChild(opt);
+                    document.getElementById("doctor-info").style.display = "none"; // 加這行隱藏
+                } else {
+                    data.forEach(d => {
+                        const opt = document.createElement("option");
+                        opt.value = d.doctor_id;
+                        opt.text = d.doctor_name;
+                        select.appendChild(opt);
+                    });
+
+                    // ✅ 加這段顯示第一位醫師評價
+                    showDoctorDetails(data[0]);
+                }
+
+
+
+            });
+    }
+
+    function showDoctorDetails(doctor) {
+        document.getElementById('doctor-info').style.display = 'block';
+        document.getElementById('avg-rating').textContent = `⭐ 平均評分：${doctor.avg_rating}`;
+
+        const commentList = document.getElementById('comment-list');
+        commentList.innerHTML = '';
+
+        if (doctor.comments && doctor.comments.length > 0) {
+            doctor.comments.forEach(comment => {
+                const li = document.createElement('li');
+                li.textContent = comment;
+                commentList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = '尚無留言';
+            commentList.appendChild(li);
+        }
+    }
+
+
+
+    document.getElementById("dept_select").addEventListener("change", fetchDoctors);
+    document.querySelector("input[name='appointment_date']").addEventListener("change", fetchDoctors);
+    document.getElementById("time_slot_select").addEventListener("change", fetchDoctors);
+    window.addEventListener("load", fetchDoctors);
 </script>
 
 <?php include("../footer.php"); ?>

@@ -29,7 +29,7 @@ if ($res->num_rows === 0) {
 
 // 標記為報到
 $now = date('Y-m-d H:i:s');
-$stmt = $conn->prepare("UPDATE appointments SET status = 'checked-in', checkin_time = ? WHERE appointment_id = ?");
+$stmt = $conn->prepare("UPDATE appointments SET status = 'checked_in', checkin_time = ? WHERE appointment_id = ?");
 $stmt->bind_param("si", $now, $appointment_id);
 if ($stmt->execute()) {
     echo "✅ 報到成功！";
@@ -37,4 +37,4 @@ if ($stmt->execute()) {
     echo "❌ 報到失敗：" . $stmt->error;
 }
 
-echo "<br><a href='appointment_list.php'>🔙 返回預約列表</a>";
+echo "<br><a href='my_appointment.php'>🔙 返回預約列表</a>";
