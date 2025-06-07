@@ -21,7 +21,7 @@ while ($row = $result->fetch_assoc()) {
     $doctor_map[$row['department_id']][] = $row;
 }
 
-// 建立時間區間（09:00~17:30，每 30 分鐘）
+// 建立時間區間（09:00~21:00，每 30 分鐘）
 function generateTimeSlots() {
     $ranges = [
         ["09:00", "12:00"],  // 早班
@@ -54,6 +54,18 @@ $time_slots = generateTimeSlots();
     <h2 style="text-align:center;">📅 新增預約</h2>
     <form method="post" action="appointment_submit.php">
         <div class="form-group">
+            <label>預約日期：</label>
+            <input type="date" name="appointment_date" required>
+        </div>
+        <div class="form-group">
+            <label>時段：</label>
+            <select name="time_slot" id="time_slot_select" required>
+                <?php foreach ($time_slots as $slot): ?>
+                    <option value="<?= $slot ?>"><?= $slot ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
             <label>科別：</label>
             <select id="dept_select" required>
                 <?php
@@ -66,18 +78,6 @@ $time_slots = generateTimeSlots();
         <div class="form-group">
             <label>醫師：</label>
             <select name="doctor_id" id="doctor_select" required></select>
-        </div>
-        <div class="form-group">
-            <label>預約日期：</label>
-            <input type="date" name="appointment_date" required>
-        </div>
-        <div class="form-group">
-            <label>時段：</label>
-            <select name="time_slot" required>
-                <?php foreach ($time_slots as $slot): ?>
-                    <option value="<?= $slot ?>"><?= $slot ?></option>
-                <?php endforeach; ?>
-            </select>
         </div>
         <div class="form-group">
             <label>服務類型：</label>
@@ -98,15 +98,30 @@ $time_slots = generateTimeSlots();
     </div>
 </div>
 <script>
+// 根據時段取得 shift
+function getShiftByTimeSlot(slot) {
+    // slot 格式 "09:00-09:30"
+    const start = slot.split('-')[0];
+    if (start >= "09:00" && start < "12:00") return "morning";
+    if (start >= "13:00" && start < "17:00") return "afternoon";
+    if (start >= "18:00" && start < "21:00") return "evening";
+    return "";
+}
+
 function fetchDoctors() {
     const dept = document.getElementById("dept_select").value;
     const date = document.querySelector("input[name='appointment_date']").value;
+    const slot = document.getElementById("time_slot_select").value;
+    const shift = getShiftByTimeSlot(slot);
     const select = document.getElementById("doctor_select");
     select.innerHTML = "<option disabled>載入中...</option>";
 
-    if (!date) return;
+    if (!date || !shift) {
+        select.innerHTML = "<option disabled selected>請先選擇日期與時段</option>";
+        return;
+    }
 
-    fetch(`get_doctors_by_schedule.php?department_id=${dept}&appointment_date=${date}`)
+    fetch(`get_doctors_by_schedule.php?department_id=${dept}&appointment_date=${date}&shift=${shift}`)
         .then(res => res.json())
         .then(data => {
             select.innerHTML = "";
@@ -129,6 +144,7 @@ function fetchDoctors() {
 
 document.getElementById("dept_select").addEventListener("change", fetchDoctors);
 document.querySelector("input[name='appointment_date']").addEventListener("change", fetchDoctors);
+document.getElementById("time_slot_select").addEventListener("change", fetchDoctors);
 window.addEventListener("load", fetchDoctors);
 </script>
 
