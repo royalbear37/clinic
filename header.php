@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -8,13 +13,31 @@
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>診所資訊系統</h1>
-            <nav class="nav-bar">
+        <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+            <!-- 左側LOGO，請將logo.png放在/clinic/images/logo.png -->
+            <a href="/clinic/index.php" style="display:inline-block;margin-right:18px;">
+                <img src="/clinic/images/logo.png" alt="醫院LOGO" style="height:48px;vertical-align:middle;">
+            </a>
+            <h1 style="margin:0 24px 0 0;flex-shrink:0;">診所資訊系統</h1>
+            <nav class="nav-bar" style="flex:1;">
                 <a href="/clinic/index.php">🏠 首頁</a>
-                <a href="/clinic/users/login.php">🔐 登入</a>
-                <a href="/clinic/users/register.php">📝 註冊</a>
+                <a href="/clinic/about.php">🏥 關於醫院</a>
+                <a href="/clinic/doctors/intro.php">👨‍⚕️ 醫師簡介</a>
+                <?php if (isset($_SESSION['role'])): ?>
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                        <a href="/clinic/admins/dashboard.php">🛠️ 管理員首頁</a>
+                    <?php elseif ($_SESSION['role'] === 'doctor'): ?>
+                        <a href="/clinic/doctors/dashboard.php">🩺 醫師首頁</a>
+                    <?php elseif ($_SESSION['role'] === 'patient'): ?>
+                        <a href="/clinic/patients/dashboard.php">👤 病患首頁</a>
+                    <?php endif; ?>
+                <?php endif; ?>
             </nav>
+            <?php if (isset($_SESSION['uid'])): ?>
+                <a href="/clinic/users/logout.php" style="margin-left:24px;color:#fff;background:#d9534f;padding:8px 18px;border-radius:4px;text-decoration:none;display:inline-block;">
+                    🚪 登出
+                </a>
+            <?php endif; ?>
         </div>
     </header>
     <main>
