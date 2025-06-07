@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../config/mysql_connect.inc.php");
+include("../header.php"); // 加入 header
 
 if (!isset($_SESSION['uid']) || $_SESSION['role'] !== 'admin') {
     header("Location: /clinic/users/login.php");
@@ -37,27 +38,31 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-<h2>📝 <?= htmlspecialchars($doctor_name) ?> 的回饋留言（<?= $month ?>）</h2>
+<div class="dashboard" style="max-width:800px;margin:40px auto;">
+    <h2>📝 <?= htmlspecialchars($doctor_name) ?> 的回饋留言（<?= $month ?>）</h2>
 
-<?php if ($result->num_rows === 0): ?>
-    <p>此月份無回饋留言。</p>
-<?php else: ?>
-    <table border="1" cellpadding="6">
-        <tr>
-            <th>病患</th>
-            <th>評分</th>
-            <th>留言</th>
-            <th>時間</th>
-        </tr>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?= htmlspecialchars($row['patient_name']) ?></td>
-                <td><?= $row['rating'] ?></td>
-                <td><?= nl2br(htmlspecialchars($row['comment'])) ?></td>
-                <td><?= $row['submitted_at'] ?></td>
+    <?php if ($result->num_rows === 0): ?>
+        <p>此月份無回饋留言。</p>
+    <?php else: ?>
+        <table border="1" cellpadding="6" style="width:100%;background:#fffdfa;">
+            <tr style="background:#f7f5f2;">
+                <th>病患</th>
+                <th>評分</th>
+                <th>留言</th>
+                <th>時間</th>
             </tr>
-        <?php endwhile; ?>
-    </table>
-<?php endif; ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['patient_name']) ?></td>
+                    <td><?= $row['rating'] ?></td>
+                    <td><?= nl2br(htmlspecialchars($row['comment'])) ?></td>
+                    <td><?= $row['submitted_at'] ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    <?php endif; ?>
 
-<p><a href="report_feedback.php?month=<?= $month ?>">🔙 回上頁</a></p>
+    <p style="margin-top:2em;"><a href="report_feedback.php?month=<?= $month ?>" class="button">🔙 回上頁</a></p>
+</div>
+
+<?php include("../footer.php"); ?>
