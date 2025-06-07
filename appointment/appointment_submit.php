@@ -45,17 +45,31 @@ if (!$patientRow) {
             $msg = "❌ 該時段已達人數上限，請選擇其他時段。";
             $msg_type = "error";
         } else {
-            // 寫入資料
-            $insert = $conn->prepare("INSERT INTO appointments (patient_id, doctor_id, appointment_date, time_slot, service_type, status) 
-                                      VALUES (?, ?, ?, ?, ?, 'scheduled')");
-            $insert->bind_param("iisss", $patient_id, $doctor_id, $appointment_date, $time_slot, $service_type);
+            // 檢查是否已有相同病患、日期、時段的預約
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM appointments WHERE patient_id = ? AND appointment_date = ? AND time_slot = ?");
+            $stmt->bind_param("iss", $patient_id, $appointment_date, $time_slot);
+            $stmt->execute();
+            $stmt->bind_result($count);
+            $stmt->fetch();
+            $stmt->close();
 
-            if ($insert->execute()) {
-                $msg = "✅ 預約成功！";
-                $msg_type = "success";
+            if ($count > 0) {
+                // 已有預約，導回並顯示錯誤
+                echo "<script>alert('同一時段不可重複預約！');history.back();</script>";
+                exit();
             } else {
-                $msg = "❌ 寫入失敗：" . $insert->error;
-                $msg_type = "error";
+                // 寫入資料
+                $insert = $conn->prepare("INSERT INTO appointments (patient_id, doctor_id, appointment_date, time_slot, service_type, status) 
+                                      VALUES (?, ?, ?, ?, ?, 'scheduled')");
+                $insert->bind_param("iisss", $patient_id, $doctor_id, $appointment_date, $time_slot, $service_type);
+
+                if ($insert->execute()) {
+                    $msg = "✅ 預約成功！";
+                    $msg_type = "success";
+                } else {
+                    $msg = "❌ 寫入失敗：" . $insert->error;
+                    $msg_type = "error";
+                }
             }
         }
     }
