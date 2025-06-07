@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<link rel="stylesheet" href="/clinic/style.css">
+<link rel="stylesheet" href="/clinic/style.css"> 
 
 <h2>診所系統登入</h2>
 
