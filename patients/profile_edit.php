@@ -48,24 +48,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<h2>🧑 我的個人資料</h2>
+<?php include("../header.php"); ?>
+<div class="dashboard" style="max-width:480px;margin:40px auto;">
+    <h2 style="text-align:center;">🧑 我的個人資料</h2>
 
-<?php if ($message): ?>
-    <p style="color:green;"><?= $message ?></p>
-<?php endif; ?>
+    <?php if ($message): ?>
+        <p class="success"><?= $message ?></p>
+    <?php endif; ?>
 
-<form method="post">
-    姓名：<input type="text" name="name" value="<?= htmlspecialchars($info['name']) ?>" required><br>
-    電子郵件：<input type="email" name="email" value="<?= htmlspecialchars($info['email']) ?>" required><br>
-    手機號碼：<input type="text" name="phone" value="<?= htmlspecialchars($info['phone']) ?>"><br>
-    性別：
-    <select name="gender">
-        <option value="male" <?= $info['gender'] === 'male' ? 'selected' : '' ?>>男</option>
-        <option value="female" <?= $info['gender'] === 'female' ? 'selected' : '' ?>>女</option>
-        <option value="other" <?= $info['gender'] === 'other' ? 'selected' : '' ?>>其他</option>
-    </select><br>
-    出生日期：<input type="date" name="birthdate" value="<?= $info['birthdate'] ?>"><br><br>
-    <button type="submit">儲存修改</button>
-</form>
+    <form method="post">
+        <div class="form-group">
+            <label>姓名：</label>
+            <input type="text" name="name" value="<?= htmlspecialchars($info['name']) ?>" required>
+        </div>
+        <div class="form-group">
+            <label>電子郵件：</label>
+            <input type="email" name="email" value="<?= htmlspecialchars($info['email']) ?>" required>
+        </div>
+        <div class="form-group">
+            <label>手機號碼：</label>
+            <input type="text" name="phone" value="<?= htmlspecialchars($info['phone']) ?>">
+        </div>
+        <div class="form-group">
+            <label>性別：</label>
+            <select name="gender">
+                <option value="male" <?= $info['gender'] === 'male' ? 'selected' : '' ?>>男</option>
+                <option value="female" <?= $info['gender'] === 'female' ? 'selected' : '' ?>>女</option>
+                <option value="other" <?= $info['gender'] === 'other' ? 'selected' : '' ?>>其他</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>出生日期：</label>
+            <input type="date" name="birthdate" value="<?= $info['birthdate'] ?>">
+        </div>
+        <button type="submit" class="button">儲存修改</button>
+    </form>
 
-<p><a href="/clinic/patients/dashboard.php">🔙 回到主頁</a></p>
+    <p style="text-align:center; margin-top:2em;">
+        <a href="/clinic/patients/dashboard.php" class="button" style="max-width:180px;">🔙 回到主頁</a>
+    </p>
+</div>
+<?php include("../footer.php"); ?>

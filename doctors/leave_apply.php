@@ -57,29 +57,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<h2>🏖️ 醫師請假登記</h2>
+<?php include("../header.php"); ?>
+<div class="dashboard" style="max-width:480px;margin:40px auto;">
+    <h2 style="text-align:center;">🏖️ 醫師請假登記</h2>
 
-<?php if ($message): ?>
-    <p style="color:<?= strpos($message, '❌') !== false ? 'red' : 'green' ?>"><?= $message ?></p>
-<?php endif; ?>
+    <?php if ($message): ?>
+        <p class="<?= strpos($message, '❌') !== false ? 'error' : 'success' ?>" style="text-align:center;">
+            <?= $message ?>
+        </p>
+    <?php endif; ?>
 
-<form method="post">
-    請假日期：<input type="date" name="leave_date" required><br>
-    開始時間：
-    <select name="start_time" required>
-        <?php foreach ($hour_options as $time): ?>
-            <option value="<?= $time ?>"><?= $time ?></option>
-        <?php endforeach; ?>
-    </select><br>
-    結束時間：
-    <select name="end_time" required>
-        <?php foreach ($hour_options as $time): ?>
-            <option value="<?= $time ?>"><?= $time ?></option>
-        <?php endforeach; ?>
-    </select><br>
-    理由備註（可留空）：<br>
-    <textarea name="reason" rows="3" cols="40"></textarea><br>
-    <button type="submit">送出請假</button>
-</form>
+    <form method="post" style="margin:2em auto;max-width:340px;">
+        <div class="form-group">
+            <label>請假日期：</label>
+            <input type="date" name="leave_date" required>
+        </div>
+        <div class="form-group">
+            <label>開始時間：</label>
+            <select name="start_time" required>
+                <?php foreach ($hour_options as $time): ?>
+                    <option value="<?= $time ?>"><?= $time ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>結束時間：</label>
+            <select name="end_time" required>
+                <?php foreach ($hour_options as $time): ?>
+                    <option value="<?= $time ?>"><?= $time ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>理由備註（可留空）：</label>
+            <textarea name="reason" rows="3" style="width:100%;"></textarea>
+        </div>
+        <button type="submit" class="button" style="width:100%;">送出請假</button>
+    </form>
 
-<p><a href="/clinic/doctors/dashboard.php">🔙 回到主頁</a></p>
+    <div style="text-align:center; margin-top:2em;">
+        <a href="/clinic/doctors/dashboard.php" class="button" style="max-width:200px;">🔙 回到主頁</a>
+    </div>
+</div>
+<?php include("../footer.php"); ?>

@@ -36,41 +36,54 @@ function generateTimeSlots($start = "09:00", $end = "17:30", $interval = 30) {
 $time_slots = generateTimeSlots();
 ?>
 
-<h2>新增預約</h2>
-
-<form method="post" action="appointment_submit.php">
-    科別：
-    <select id="dept_select">
-        <?php
-        $departments->data_seek(0);
-        while ($dept = $departments->fetch_assoc()): ?>
-            <option value="<?= $dept['department_id'] ?>"><?= $dept['name'] ?></option>
-        <?php endwhile; ?>
-    </select><br>
-
-    醫師：
-    <select name="doctor_id" id="doctor_select" required></select><br>
-
-    預約日期：<input type="date" name="appointment_date" required><br>
-
-    時段：
-    <select name="time_slot" required>
-        <?php foreach ($time_slots as $slot): ?>
-            <option value="<?= $slot ?>"><?= $slot ?></option>
-        <?php endforeach; ?>
-    </select><br>
-
-    服務類型：
-    <select name="service_type" required>
-        <option value="consultation">一般諮詢</option>
-        <option value="checkup">健檢</option>
-        <option value="follow_up">回診</option>
-        <option value="emergency">急診</option>
-    </select><br>
-
-    <button type="submit">送出預約</button>
-</form>
-
+<?php include("../header.php"); ?>
+<div class="dashboard" style="max-width:480px;margin:40px auto;">
+    <h2 style="text-align:center;">📅 新增預約</h2>
+    <form method="post" action="appointment_submit.php">
+        <div class="form-group">
+            <label>科別：</label>
+            <select id="dept_select" required>
+                <?php
+                $departments->data_seek(0);
+                while ($dept = $departments->fetch_assoc()): ?>
+                    <option value="<?= $dept['department_id'] ?>"><?= $dept['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>醫師：</label>
+            <select name="doctor_id" id="doctor_select" required></select>
+        </div>
+        <div class="form-group">
+            <label>預約日期：</label>
+            <input type="date" name="appointment_date" required>
+        </div>
+        <div class="form-group">
+            <label>時段：</label>
+            <select name="time_slot" required>
+                <?php foreach ($time_slots as $slot): ?>
+                    <option value="<?= $slot ?>"><?= $slot ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>服務類型：</label>
+            <select name="service_type" required>
+                <option value="consultation">一般諮詢</option>
+                <option value="checkup">健檢</option>
+                <option value="follow_up">回診</option>
+                <option value="emergency">急診</option>
+            </select>
+        </div>
+        <button type="submit" class="button">送出預約</button>
+    </form>
+    <div style="text-align:center; margin-top:2em;">
+        <a href="/clinic/schedule/schedule_overview.php" class="button" style="max-width:200px;">📅 查看醫師班表</a>
+        <?php if (isset($_SESSION['role'])): ?>
+            <a href="/clinic/<?= $_SESSION['role'] ?>s/dashboard.php" class="button" style="max-width:200px;">🔙 回到主頁</a>
+        <?php endif; ?>
+    </div>
+</div>
 <script>
 const doctorsByDept = <?= json_encode($doctor_map) ?>;
 
@@ -92,11 +105,4 @@ document.getElementById("dept_select").addEventListener("change", function() {
 // 初始化載入
 updateDoctors(document.getElementById("dept_select").value);
 </script>
-
-<?php
-if (isset($_SESSION['role'])) {
-    $role = $_SESSION['role'];
-    echo "<p><a href='/clinic/schedule/schedule_overview.php'>📅 查看醫師班表</a></p>";
-    echo "<p><a href='/clinic/{$role}s/dashboard.php'>🔙 回到主頁</a></p>";
-}
-?>
+<?php include("../footer.php"); ?>

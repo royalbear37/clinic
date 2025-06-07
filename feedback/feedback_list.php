@@ -57,31 +57,42 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-<h2>回饋紀錄</h2>
+<?php include("../header.php"); ?>
+<div class="dashboard" style="max-width:900px;margin:40px auto;">
+    <h2 style="text-align:center;">回饋紀錄</h2>
+    <?php if ($result->num_rows === 0): ?>
+        <p>目前沒有回饋資料。</p>
+    <?php else: ?>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;background:#fffdfa;">
+            <thead>
+                <tr style="background: #f7f5f2; color: #23272f;">
+                    <th>看診日期</th>
+                    <th>時段</th>
+                    <th><?= $role === 'patient' ? '醫師' : '病患' ?></th>
+                    <th>評分</th>
+                    <th>留言</th>
+                    <th>填寫時間</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr style="text-align:center;">
+                    <td><?= htmlspecialchars($row['appointment_date']) ?></td>
+                    <td><?= htmlspecialchars($row['time_slot']) ?></td>
+                    <td><?= $role === 'patient' ? htmlspecialchars($row['doctor_name']) : htmlspecialchars($row['patient_name']) ?></td>
+                    <td><?= htmlspecialchars($row['rating']) ?></td>
+                    <td><?= nl2br(htmlspecialchars($row['comment'])) ?></td>
+                    <td><?= htmlspecialchars($row['submitted_at']) ?></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+        </div>
+    <?php endif; ?>
 
-<?php if ($result->num_rows === 0): ?>
-    <p>目前沒有回饋資料。</p>
-<?php else: ?>
-    <table border="1" cellpadding="6">
-        <tr>
-            <th>看診日期</th>
-            <th>時段</th>
-            <th><?= $role === 'patient' ? '醫師' : '病患' ?></th>
-            <th>評分</th>
-            <th>留言</th>
-            <th>填寫時間</th>
-        </tr>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?= $row['appointment_date'] ?></td>
-                <td><?= $row['time_slot'] ?></td>
-                <td><?= $role === 'patient' ? $row['doctor_name'] : $row['patient_name'] ?></td>
-                <td><?= $row['rating'] ?></td>
-                <td><?= nl2br(htmlspecialchars($row['comment'])) ?></td>
-                <td><?= $row['submitted_at'] ?></td>
-            </tr>
-        <?php endwhile; ?>
-    </table>
-<?php endif; ?>
-
-<p><a href="/clinic/<?= $role ?>s/dashboard.php">🔙 回到主頁</a></p>
+    <div style="text-align:center; margin-top:2em;">
+        <a href="/clinic/<?= $role ?>s/dashboard.php" class="button" style="max-width:200px;">🔙 回到主頁</a>
+    </div>
+</div>
+<?php include("../footer.php"); ?>

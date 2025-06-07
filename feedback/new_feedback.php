@@ -36,33 +36,39 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-<h2>填寫回饋評價</h2>
+<?php include("../header.php"); ?>
+<div class="dashboard" style="max-width:480px;margin:40px auto;">
+    <h2 style="text-align:center;">📝 填寫回饋評價</h2>
+    <form method="post" action="feedback_submit.php">
+        <div class="form-group">
+            <label>預約：</label>
+            <select name="appointment_id" required>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <option value="<?= $row['appointment_id'] ?>">
+                        <?= $row['appointment_date'] ?> <?= $row['time_slot'] ?> - <?= $row['doctor_name'] ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>滿意度評分（1~5）：</label>
+            <input type="number" name="rating" min="1" max="5" required>
+        </div>
+        <div class="form-group">
+            <label>留言建議（可選）：</label>
+            <textarea name="comment" rows="4"></textarea>
+        </div>
+        <button type="submit" class="button">送出回饋</button>
+    </form>
 
-<form method="post" action="feedback_submit.php">
-    預約：
-    <select name="appointment_id" required>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <option value="<?= $row['appointment_id'] ?>">
-                <?= $row['appointment_date'] ?> <?= $row['time_slot'] ?> - <?= $row['doctor_name'] ?>
-            </option>
-        <?php endwhile; ?>
-    </select><br>
+    <form method="get" action="feedback_list.php" style="margin-top: 18px;">
+        <button type="submit" class="button" style="max-width:220px;">📋 查看歷史回饋</button>
+    </form>
 
-    滿意度評分（1~5）：<input type="number" name="rating" min="1" max="5" required><br>
-    留言建議（可選）：<br>
-    <textarea name="comment" rows="4" cols="40"></textarea><br>
-
-    <button type="submit">送出回饋</button>
-</form>
-
-<form method="get" action="feedback_list.php" style="margin-top: 10px;">
-    <button type="submit">📋 查看歷史回饋</button>
-</form>
-
-
-<?php
-if (isset($_SESSION['role'])) {
-    $role = $_SESSION['role'];
-    echo "<p><a href='/clinic/{$role}s/dashboard.php'>🔙 回到主頁</a></p>";
-}
-?>
+    <?php if (isset($_SESSION['role'])): ?>
+        <p style="text-align:center; margin-top:2em;">
+            <a href="/clinic/<?= $_SESSION['role'] ?>s/dashboard.php" class="button" style="max-width:180px;">🔙 回到主頁</a>
+        </p>
+    <?php endif; ?>
+</div>
+<?php include("../footer.php"); ?>
