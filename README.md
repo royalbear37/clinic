@@ -7,3 +7,11 @@ clone到之前作業用的AppServ/www資料夾裡面
 請將 config 裡的 mysql_connect.sample.php 複製一份(要保留sample)，並重新命名為 mysql_connect.inc.php，並且把裡面的密碼改成自己的  
 ****
 一開始db裡面沒有任何使用者，要先自己建  
+****
+****
+AI機器人
+****
+打開你的：C:\AppServ\php7\php.ini
+****
+搜尋：curl.cainfo
+請將curl.cainfo這一行修改為：curl.cainfo = "C:\AppServ\www\clinic\ai_assistant\cacert.pem"
