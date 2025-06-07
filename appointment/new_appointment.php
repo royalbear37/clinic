@@ -22,17 +22,30 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // 建立時間區間（09:00~17:30，每 30 分鐘）
-function generateTimeSlots($start = "09:00", $end = "17:30", $interval = 30) {
+function generateTimeSlots() {
+    $ranges = [
+        ["09:00", "12:00"],  // 早班
+        ["13:00", "17:00"],  // 中班
+        ["18:00", "21:00"]   // 晚班
+    ];
+
+    $interval = 30; // 每 30 分鐘
     $slots = [];
-    $startTime = strtotime($start);
-    $endTime = strtotime($end);
-    while ($startTime < $endTime) {
-        $nextTime = $startTime + $interval * 60;
-        $slots[] = date("H:i", $startTime) . "-" . date("H:i", $nextTime);
-        $startTime = $nextTime;
+
+    foreach ($ranges as [$start, $end]) {
+        $startTime = strtotime($start);
+        $endTime = strtotime($end);
+
+        while ($startTime < $endTime) {
+            $nextTime = $startTime + $interval * 60;
+            $slots[] = date("H:i", $startTime) . "-" . date("H:i", $nextTime);
+            $startTime = $nextTime;
+        }
     }
+
     return $slots;
 }
+
 $time_slots = generateTimeSlots();
 ?>
 
@@ -85,24 +98,38 @@ $time_slots = generateTimeSlots();
     </div>
 </div>
 <script>
-const doctorsByDept = <?= json_encode($doctor_map) ?>;
-
-function updateDoctors(dept_id) {
+function fetchDoctors() {
+    const dept = document.getElementById("dept_select").value;
+    const date = document.querySelector("input[name='appointment_date']").value;
     const select = document.getElementById("doctor_select");
-    select.innerHTML = "";
-    (doctorsByDept[dept_id] || []).forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = d.doctor_id;
-        opt.text = d.doctor_name;
-        select.appendChild(opt);
-    });
+    select.innerHTML = "<option disabled>載入中...</option>";
+
+    if (!date) return;
+
+    fetch(`get_doctors_by_schedule.php?department_id=${dept}&appointment_date=${date}`)
+        .then(res => res.json())
+        .then(data => {
+            select.innerHTML = "";
+            if (data.length === 0) {
+                const opt = document.createElement("option");
+                opt.disabled = true;
+                opt.selected = true;
+                opt.text = "此日無醫師排班";
+                select.appendChild(opt);
+            } else {
+                data.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d.doctor_id;
+                    opt.text = d.doctor_name;
+                    select.appendChild(opt);
+                });
+            }
+        });
 }
 
-document.getElementById("dept_select").addEventListener("change", function() {
-    updateDoctors(this.value);
-});
-
-// 初始化載入
-updateDoctors(document.getElementById("dept_select").value);
+document.getElementById("dept_select").addEventListener("change", fetchDoctors);
+document.querySelector("input[name='appointment_date']").addEventListener("change", fetchDoctors);
+window.addEventListener("load", fetchDoctors);
 </script>
+
 <?php include("../footer.php"); ?>

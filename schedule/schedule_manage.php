@@ -14,7 +14,7 @@ $doctors = $conn->query("SELECT d.doctor_id, u.name FROM doctors d JOIN users u 
 $shifts = [
     'morning' => '早班（09:00～12:00）',
     'afternoon' => '中班（13:00～17:00）',
-    'evening' => '晚班（17:00～20:00）'
+    'evening' => '晚班（18:00～21:00）'
 ];
 ?>
 
