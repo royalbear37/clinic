@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
 $username = "root";
-$password = "自己的密碼";  // 如果沒有密碼就留空字串 ""
+$password = "abc060744";  // 如果沒有密碼就留空字串 ""
 $database = "clinic_db";
 
 $conn = new mysqli($host, $username, $password, $database);
