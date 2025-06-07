@@ -101,3 +101,29 @@ CREATE TABLE notifications (
   FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id),
   FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 預設醫生 user
+INSERT INTO users (user_id, id_number, password, role, name, email) VALUES
+('doc101', 'A123456789', 'password1', 'doctomor', '林小芳', 'doc101@example.c'),
+('doc102', 'B123456789', 'password2', 'doctor', '李小華', 'doc102@example.com'),
+('doc103', 'C123456789', 'password3', 'doctor', '陳美麗', 'doc103@example.com'),
+('doc104', 'D123456789', 'password4', 'doctor', '張志強', 'doc104@example.com'),
+('doc105', 'E123456789', 'password5', 'doctor', '王大明', 'doc105@example.com'),
+('doc106', 'F123456789', 'password6', 'doctor', '黃偉哲', 'doc106@example.com'),
+('doc107', 'G123456789', 'password7', 'doctor', '吳怡君', 'doc107@example.com'),
+('doc108', 'H123456789', 'password8', 'doctor', '周建國', 'doc108@example.com'),
+('doc109', 'I123456789', 'password9', 'doctor', '許雅婷', 'doc109@example.com'),
+('doc110', 'J123456789', 'password10', 'doctor', '鄭文豪', 'doc110@example.com');
+
+-- 將 user id 取出對應 doctors
+INSERT INTO doctors (user_id, department_id, profile, is_active, photo_url) VALUES
+((SELECT id FROM users WHERE user_id='doc101'), 101, '眼科專長：白內障、青光眼', '1', "1.jpg"),
+((SELECT id FROM users WHERE user_id='doc102'), 101, '眼科專長：視網膜、近視雷射', '1', "2.jpg"),
+((SELECT id FROM users WHERE user_id='doc103'), 102, '耳鼻喉專長：過敏性鼻炎', '1', "3.jpg"),
+((SELECT id FROM users WHERE user_id='doc104'), 102, '耳鼻喉專長：中耳炎、聽力障礙', '1', "4.jpg"),
+((SELECT id FROM users WHERE user_id='doc105'), 103, '小兒科專長：新生兒照護', '1', "5.jpg"),
+((SELECT id FROM users WHERE user_id='doc106'), 103, '小兒科專長：兒童過敏、氣喘', '1', "6.jpg"),
+((SELECT id FROM users WHERE user_id='doc107'), 104, '皮膚科專長：青春痘、濕疹', '1', "7.jpg"),
+((SELECT id FROM users WHERE user_id='doc108'), 104, '皮膚科專長：皮膚過敏、蕁麻疹', '1', "10.jpg"),
+((SELECT id FROM users WHERE user_id='doc109'), 105, '骨科專長：關節炎、骨折', '1', "8.jpg"),
+((SELECT id FROM users WHERE user_id='doc110'), 105, '骨科專長：脊椎側彎、運動傷害', '1', "9.jpg");

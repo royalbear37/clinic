@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../config/mysql_connect.inc.php");
+include("../header.php");
 
 if (!isset($_SESSION['uid']) || $_SESSION['role'] !== 'admin') {
     header("Location: /clinic/users/login.php");
@@ -71,6 +72,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
+<div class="dashboard" style="max-width:1000px;margin:40px auto;">
 <h2>👤 使用者管理（含醫師簡介編輯）</h2>
 
 <form method="get" style="margin-bottom: 15px;">
@@ -85,14 +87,13 @@ $result = $stmt->get_result();
     <button type="submit">🔍 查詢</button>
 </form>
 
-<table border="1" cellpadding="6">
+<table border="1" cellpadding="6" style="width:100%;text-align:center;">
     <tr>
         <th>姓名</th>
         <th>帳號 ID</th>
         <th>身份證號</th>
         <th>角色</th>
         <th>註冊時間</th>
-        <th>編輯</th>
         <th>刪除</th>
     </tr>
     <?php while ($row = $result->fetch_assoc()): ?>
@@ -103,9 +104,6 @@ $result = $stmt->get_result();
                 <td><?= $row['id_number'] ?></td>
                 <td><?= $row['role'] ?></td>
                 <td><?= $row['created_at'] ?></td>
-                <td>
-                    —
-                </td>
             </form>
             <td>
                 <?php if ($row['id'] != $_SESSION['uid']): ?>
@@ -130,28 +128,40 @@ $result = $stmt->get_result();
             $tid = 'photo_url_' . $row['id'];
         ?>
         <tr>
-            <td colspan="7">
-                <form method="post" id="doctor_edit_form_<?= $row['id'] ?>">
-                    醫師簡介：<br>
-                    <textarea name="new_profile" rows="2" cols="100"><?= htmlspecialchars($doc['profile'] ?? '') ?></textarea><br>
-                    <label>醫師照片檔名：</label>
-                    <?php if (!empty($doc['photo_url'])): ?>
-                        <img src="/clinic/uploads/<?= htmlspecialchars($doc['photo_url']) ?>" alt="醫師照片" style="max-height:60px;">
-                    <?php endif; ?>
-                    <input type="file" id="<?= $fid ?>" style="display:none;">
-                    <input type="text" name="photo_url" id="<?= $tid ?>" value="<?= htmlspecialchars($doc['photo_url'] ?? '') ?>" placeholder="doctor_xxx.jpg">
-                    <button type="button" onclick="document.getElementById('<?= $fid ?>').click();">選擇檔案</button><br>
-                    <input type="hidden" name="update_doctor_id" value="<?= $row['id'] ?>">
-                    <button type="submit">✏️ 更新簡介與照片檔名</button>
-                </form>
-                <script>
-                // JS: 檔案選取後自動填入檔名
-                document.getElementById('<?= $fid ?>').addEventListener('change', function() {
-                    if (this.files.length > 0) {
-                        document.getElementById('<?= $tid ?>').value = this.files[0].name;
-                    }
-                });
-                </script>
+            <td colspan="7" style="background:#f9f9f9;">
+                <div style="max-width:600px;margin:32px auto 16px auto;padding:36px 32px 32px 32px;border-radius:18px;box-shadow:0 4px 24px #e0e0e0;background:#fff;">
+                    <form method="post" id="doctor_edit_form_<?= $row['id'] ?>">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+                            <div style="text-align:center;">
+                                <?php if (!empty($doc['photo_url'])): ?>
+                                    <img src="/clinic/uploads/<?= htmlspecialchars($doc['photo_url']) ?>" alt="醫師照片" style="width:180px;height:180px;object-fit:cover;border-radius:14px;border:2px solid #ddd;">
+                                <?php else: ?>
+                                    <div style="width:180px;height:180px;background:#eee;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:1.3em;">無照片</div>
+                                <?php endif; ?>
+                                <div style="margin-top:10px;">
+                                    <input type="file" id="<?= $fid ?>" style="display:none;">
+                                    <input type="text" name="photo_url" id="<?= $tid ?>" value="<?= htmlspecialchars($doc['photo_url'] ?? '') ?>" placeholder="doctor_xxx.jpg" style="width:180px;padding:8px 12px;border-radius:8px;border:1px solid #ccc;">
+                                    <button type="button" onclick="document.getElementById('<?= $fid ?>').click();" style="margin-left:8px;background:#222;color:#fff;padding:8px 16px;border-radius:8px;border:none;font-size:1em;">選擇檔案</button>
+                                </div>
+                            </div>
+                            <div style="width:100%;margin-top:18px;">
+                                <label style="font-weight:bold;font-size:1.13em;letter-spacing:1px;display:block;margin-bottom:8px;">醫師簡介</label>
+                                <textarea name="new_profile" rows="6" style="width:100%;padding:14px 12px;font-size:1.13em;border-radius:8px;border:1.5px solid #bfc9d1;background:#fff;resize:vertical;box-sizing:border-box;" placeholder="請輸入醫師簡介"><?= htmlspecialchars($doc['profile'] ?? '') ?></textarea>
+                            </div>
+                            <input type="hidden" name="update_doctor_id" value="<?= $row['id'] ?>">
+                            <button type="submit" style="background:#2563eb;color:#fff;padding:12px 38px;border-radius:8px;border:none;font-size:1.13em;letter-spacing:1px;box-shadow:0 2px 8px #c7d2fe;transition:background 0.2s;">
+                                更新
+                            </button>
+                        </div>
+                    </form>
+                    <script>
+                    document.getElementById('<?= $fid ?>').addEventListener('change', function() {
+                        if (this.files.length > 0) {
+                            document.getElementById('<?= $tid ?>').value = this.files[0].name;
+                        }
+                    });
+                    </script>
+                </div>
             </td>
         </tr>
         <?php endif; ?>
@@ -159,3 +169,5 @@ $result = $stmt->get_result();
 </table>
 
 <p><a href="/clinic/admins/dashboard.php">🔙 回到主頁</a></p>
+</div>
+<?php include("../footer.php"); ?>

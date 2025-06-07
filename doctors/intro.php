@@ -135,9 +135,20 @@ include("../header.php");
                 }
                 $marqueeDoctors = array_merge($all_doctors, $all_doctors);
                 foreach ($marqueeDoctors as $row):
-                    $photo = !empty($row['photo_url']) ? "/clinic/uploads/" . htmlspecialchars($row['photo_url']) : "/clinic/uploads/default.png";
+                    // 直接用資料庫的 photo_url 欄位（建議存 9.jpg 或 uploads/9.jpg）
+                    if (!empty($row['photo_url'])) {
+                        // 若存檔名
+                        if (strpos($row['photo_url'], '/') === false) {
+                            $photo = "/clinic/uploads/" . htmlspecialchars($row['photo_url']);
+                        } else {
+                            // 若存 uploads/9.jpg 這種相對路徑
+                            $photo = "/clinic/" . ltrim($row['photo_url'], "/");
+                        }
+                    } else {
+                        $photo = "/clinic/uploads/default.png";
+                    }
                 ?>
-                <div class="doctor-marquee-card" onclick="location.href='doctor_detail.php?id=<?= $row['doctor_id'] ?>'">
+                <div class="doctor-marquee-card">
                     <img src="<?= $photo ?>" alt="醫師照片" class="doctor-marquee-photo">
                     <div class="doctor-marquee-name"><?= htmlspecialchars($row['name']) ?></div>
                     <div class="doctor-marquee-profile"><?= nl2br(htmlspecialchars($row['profile'] ?? '尚無簡介')) ?></div>
@@ -205,9 +216,17 @@ if (!$dep_id) {
                 // 跑馬燈無縫，重複一份
                 $marqueeDoctors = array_merge($doctors, $doctors);
                 foreach ($marqueeDoctors as $row):
-                    $photo = !empty($row['photo_url']) ? "/clinic/uploads/" . htmlspecialchars($row['photo_url']) : "/clinic/uploads/default.png";
+                    if (!empty($row['photo_url'])) {
+                        if (strpos($row['photo_url'], '/') === false) {
+                            $photo = "/clinic/uploads/" . htmlspecialchars($row['photo_url']);
+                        } else {
+                            $photo = "/clinic/" . ltrim($row['photo_url'], "/");
+                        }
+                    } else {
+                        $photo = "/clinic/uploads/default.png";
+                    }
                 ?>
-                <div class="doctor-marquee-card" onclick="location.href='doctor_detail.php?id=<?= $row['doctor_id'] ?>'">
+                <div class="doctor-marquee-card">
                     <img src="<?= $photo ?>" alt="醫師照片" class="doctor-marquee-photo">
                     <div class="doctor-marquee-name"><?= htmlspecialchars($row['name']) ?></div>
                     <div class="doctor-marquee-profile"><?= nl2br(htmlspecialchars($row['profile'] ?? '尚無簡介')) ?></div>
