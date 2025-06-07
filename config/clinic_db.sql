@@ -67,7 +67,7 @@ CREATE TABLE appointments (
   appointment_date DATE,
   time_slot VARCHAR(50),
   service_type ENUM('consultation', 'checkup', 'follow_up', 'emergency'),
-  status ENUM('scheduled', 'checked_in', 'cancelled', 'completed'),
+  status ENUM('scheduled', 'checked_in', 'cancelled', 'completed', 'no-show'),
   checkin_time DATETIME,
   substitute_doctor_id INT,
   modified_by_admin_id INT,
