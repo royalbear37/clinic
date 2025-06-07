@@ -3,112 +3,231 @@ include("../config/mysql_connect.inc.php");
 include("../header.php");
 ?>
 <style>
-.dept-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2em;
-    justify-content: center;
-    margin: 40px 0 30px 0;
-}
-.dept-item {
+.sidebar-dept-list {
+    width: 100%;
     background: #f8f6f2;
-    border-radius: 10px;
-    padding: 2em 2.5em;
-    font-size: 1.3em;
-    box-shadow: 0 1px 6px #eee;
-    text-align: center;
-    min-width: 140px;
-    transition: box-shadow 0.2s;
+    border-radius: 12px;
+    box-shadow: 0 1px 8px #eee;
+    padding: 1em 0.5em 1em 0.5em;
+    margin: 0 0 2em 0;
+    display: flex;
+    flex-direction: row;
+    gap: 1.5em;
+    justify-content: center;
+    align-items: center;
+    height: auto;
 }
-.dept-item a {
-    text-decoration: none;
+.sidebar-dept-item {
+    display: flex;
+}
+.sidebar-dept-item a {
+    display: block;
+    padding: 0.7em 2.2em;
+    border-radius: 8px;
     color: #3a6ea5;
     font-weight: bold;
-    display: block;
+    text-decoration: none;
+    font-size: 1.18em;
+    letter-spacing: 2px;
+    transition: background 0.2s, color 0.2s;
+    text-align: center;
 }
-.dept-item a:hover {
+.sidebar-dept-item a.active,
+.sidebar-dept-item a:hover {
+    background: #e5e1d8;
     color: #d4af37;
 }
-.doctor-list-table {
+.main-content-flex {
+    display: block;
+}
+.doctor-marquee-container {
     width: 100%;
-    border-collapse: collapse;
+    max-width: 900px;
+    overflow: hidden;
     margin: 0 auto 30px auto;
+    background: transparent;
+    position: relative;
+    height: 270px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.doctor-marquee-track {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    animation: marquee 18s linear infinite;
+    justify-content: center;
+}
+.doctor-marquee-card {
+    flex: 0 0 320px;
+    margin: 0 32px;
     background: #fff;
-    box-shadow: 0 2px 12px #eee;
-    font-size: 1.08em;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px #e5e1d8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em 1em 1.5em 1em;
+    text-align: center;
+    transition: box-shadow 0.2s;
+    cursor: pointer;
 }
-.doctor-list-table th, .doctor-list-table td {
-    border: 1px solid #e5e1d8;
-    padding: 12px 8px;
+.doctor-marquee-card:hover {
+    box-shadow: 0 4px 18px #d4af37;
 }
-.doctor-list-table th {
+.doctor-marquee-photo {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #e5e1d8;
     background: #f8f6f2;
-    color: #7a7a85;
-    font-weight: bold;
-}
-.doctor-list-table tr:nth-child(even) {
-    background: #faf9f7;
-}
-.doctor-list-table tr:hover {
-    background: #f0f7ff;
-}
-.doctor-profile {
-    text-align: left;
-    color: #555;
-    line-height: 1.7;
-    max-width: 350px;
-    margin: 0 auto;
-}
-.dashboard h2 {
-    color: #3a6ea5;
     margin-bottom: 1em;
+    box-shadow: 0 2px 16px #e5e1d8;
+    transition: box-shadow 0.3s;
+}
+.doctor-marquee-name {
+    font-size: 1.25em;
+    font-weight: bold;
+    color: #3a6ea5;
+    margin-bottom: 0.5em;
+    word-break: break-all;
+}
+.doctor-marquee-profile {
+    color: #555;
+    font-size: 1.08em;
+    line-height: 1.7;
+    min-height: 40px;
+    margin-bottom: 0.2em;
+}
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+@media (max-width: 1100px) {
+    .doctor-marquee-container { width: 98vw; }
+}
+@media (max-width: 600px) {
+    .sidebar-dept-list { flex-direction: column; gap: 0.5em; }
+    .sidebar-dept-item a { padding: 0.7em 1em; font-size: 1em;}
+    .doctor-marquee-card { flex: 0 0 90vw; max-width: 320px; }
+    .doctor-marquee-photo { width: 60vw; height: 60vw; max-width: 120px; max-height: 120px;}
 }
 </style>
-<div class="dashboard" style="max-width:900px;margin:40px auto;">
+<div class="dashboard" style="max-width:1200px;margin:40px auto;">
     <h2>👨‍⚕️ 醫師資訊查詢</h2>
-<?php
-$dep_id = isset($_GET['dep']) ? intval($_GET['dep']) : 0;
-
-if (!$dep_id) {
-    // 顯示五個科別按鈕
-    $deps = $conn->query("SELECT department_id, name FROM departments ORDER BY department_id");
-    echo '<div class="dept-list">';
-    while ($dep = $deps->fetch_assoc()) {
-        echo '<div class="dept-item"><a href="?dep=' . $dep['department_id'] . '">' . htmlspecialchars($dep['name']) . '</a></div>';
+    <?php
+    $dep_id = isset($_GET['dep']) ? intval($_GET['dep']) : 0;
+    // 只有在沒選科別時顯示所有醫師跑馬燈
+    if (!$dep_id) {
+        ?>
+        <div class="doctor-marquee-container">
+            <div class="doctor-marquee-track" id="allDoctorMarqueeTrack">
+                <?php
+                $sql = "SELECT d.doctor_id, u.name, d.photo_url, d.profile
+                        FROM doctors d
+                        JOIN users u ON d.user_id = u.id";
+                $result = $conn->query($sql);
+                $all_doctors = [];
+                while ($row = $result->fetch_assoc()) {
+                    $all_doctors[] = $row;
+                }
+                $marqueeDoctors = array_merge($all_doctors, $all_doctors);
+                foreach ($marqueeDoctors as $row):
+                    $photo = !empty($row['photo_url']) ? "/clinic/uploads/" . htmlspecialchars($row['photo_url']) : "/clinic/uploads/default.png";
+                ?>
+                <div class="doctor-marquee-card" onclick="location.href='doctor_detail.php?id=<?= $row['doctor_id'] ?>'">
+                    <img src="<?= $photo ?>" alt="醫師照片" class="doctor-marquee-photo">
+                    <div class="doctor-marquee-name"><?= htmlspecialchars($row['name']) ?></div>
+                    <div class="doctor-marquee-profile"><?= nl2br(htmlspecialchars($row['profile'] ?? '尚無簡介')) ?></div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var track = document.getElementById('allDoctorMarqueeTrack');
+            var cardCount = track.children.length / 2;
+            var duration = Math.max(10, cardCount * 3);
+            track.style.animationDuration = duration + 's';
+        });
+        </script>
+        <?php
     }
-    echo '</div>';
-    echo '<div style="text-align:center;color:#888;">請點選科別以瀏覽該科醫師</div>';
-} else {
-    // 顯示該科別的醫師
-    $dep_stmt = $conn->prepare("SELECT name FROM departments WHERE department_id=?");
-    $dep_stmt->bind_param("i", $dep_id);
-    $dep_stmt->execute();
-    $dep_stmt->bind_result($dep_name);
-    $dep_stmt->fetch();
-    $dep_stmt->close();
-
-    echo '<h3 style="text-align:center;">科別：' . htmlspecialchars($dep_name) . '</h3>';
-
-    $sql = "SELECT d.doctor_id, u.name, d.profile
+    ?>
+    <div class="main-content-flex">
+        <!-- 側邊欄科別 -->
+        <div class="sidebar-dept-list">
+            <?php
+            $deps = $conn->query("SELECT department_id, name FROM departments ORDER BY department_id");
+            $dept_arr = [];
+            while ($dep = $deps->fetch_assoc()) {
+                $dept_arr[] = $dep;
+                $active = ($dep_id == $dep['department_id']) ? 'active' : '';
+                echo '<div class="sidebar-dept-item"><a href="?dep=' . $dep['department_id'] . '" class="' . $active . '">' . htmlspecialchars($dep['name']) . '</a></div>';
+            }
+            ?>
+        </div>
+        <!-- 主要內容 -->
+        <div style="flex:1;">
+<?php
+// 取得所有科別的醫師（依科別分組）
+$all_doctors_by_dept = [];
+foreach ($dept_arr as $dept) {
+    $sql = "SELECT d.doctor_id, u.name, d.photo_url, d.profile
             FROM doctors d
             JOIN users u ON d.user_id = u.id
             WHERE d.department_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $dep_id);
+    $stmt->bind_param("i", $dept['department_id']);
     $stmt->execute();
     $result = $stmt->get_result();
-
-    echo '<table class="doctor-list-table">';
-    echo '<tr><th>姓名</th><th>簡介</th></tr>';
+    $all_doctors_by_dept[$dept['department_id']] = [];
     while ($row = $result->fetch_assoc()) {
-        echo '<tr>';
-        echo '<td>' . htmlspecialchars($row['name']) . '</td>';
-        echo '<td class="doctor-profile">' . nl2br(htmlspecialchars($row['profile'] ?? '尚無簡介')) . '</td>';
-        echo '</tr>';
+        $all_doctors_by_dept[$dept['department_id']][] = $row;
     }
-    echo '</table>';
-    echo '<div style="text-align:center;margin-top:2em;"><a href="intro.php" style="color:#3a6ea5;">← 返回科別列表</a></div>';
+    $stmt->close();
+}
+
+// 只顯示目前選取的科別
+if (!$dep_id) {
+    echo '<div style="text-align:center;color:#888;margin-top:80px;">請點選左側科別以瀏覽該科醫師</div>';
+} else {
+    $doctors = $all_doctors_by_dept[$dep_id];
+    if (count($doctors) === 0) {
+        echo '<div style="text-align:center;color:#888;">此科別暫無醫師資料</div>';
+    } else {
+        ?>
+        <div class="doctor-marquee-container">
+            <div class="doctor-marquee-track" id="doctorMarqueeTrack">
+                <?php
+                // 跑馬燈無縫，重複一份
+                $marqueeDoctors = array_merge($doctors, $doctors);
+                foreach ($marqueeDoctors as $row):
+                    $photo = !empty($row['photo_url']) ? "/clinic/uploads/" . htmlspecialchars($row['photo_url']) : "/clinic/uploads/default.png";
+                ?>
+                <div class="doctor-marquee-card" onclick="location.href='doctor_detail.php?id=<?= $row['doctor_id'] ?>'">
+                    <img src="<?= $photo ?>" alt="醫師照片" class="doctor-marquee-photo">
+                    <div class="doctor-marquee-name"><?= htmlspecialchars($row['name']) ?></div>
+                    <div class="doctor-marquee-profile"><?= nl2br(htmlspecialchars($row['profile'] ?? '尚無簡介')) ?></div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var track = document.getElementById('doctorMarqueeTrack');
+            var cardCount = track.children.length / 2;
+            var duration = Math.max(10, cardCount * 3);
+            track.style.animationDuration = duration + 's';
+        });
+        </script>
+        <?php
+    }
 }
 ?>
+        </div>
+    </div>
 </div>
 <?php include("../footer.php"); ?>
