@@ -1,14 +1,24 @@
 :root {
-  --primary: #2d323a;          /* 深灰藍，稍柔和，提升沉穩感 */
-  --accent: #d1b656;           /* 柔金，略調亮，減少刺眼 */
-  --bg: #f9f7f4;               /* 米白，偏暖，舒適背景 */
-  --card-bg: #fffefc;          /* 卡片米白，純淨但不過於刺眼 */
-  --text: #1f252d;             /* 主文字，深灰提升可讀性 */
-  --subtext: #6b6b76;          /* 輔助文字，柔和灰色 */
-  --border: #e2ded6;           /* 柔和邊框，溫暖色調 */
-  --shadow: 0 6px 20px rgba(34, 35, 43, 0.06); /* 更柔和的陰影 */
-  --glass: blur(10px) saturate(160%); /* 玻璃效果稍增柔和 */
-  --radius: 12px;              /* 圓角稍減，現代且不過分 */
+  --primary: #2d323a;
+  /* 深灰藍，稍柔和，提升沉穩感 */
+  --accent: #d1b656;
+  /* 柔金，略調亮，減少刺眼 */
+  --bg: #f9f7f4;
+  /* 米白，偏暖，舒適背景 */
+  --card-bg: #fffefc;
+  /* 卡片米白，純淨但不過於刺眼 */
+  --text: #1f252d;
+  /* 主文字，深灰提升可讀性 */
+  --subtext: #6b6b76;
+  /* 輔助文字，柔和灰色 */
+  --border: #e2ded6;
+  /* 柔和邊框，溫暖色調 */
+  --shadow: 0 6px 20px rgba(34, 35, 43, 0.06);
+  /* 更柔和的陰影 */
+  --glass: blur(10px) saturate(160%);
+  /* 玻璃效果稍增柔和 */
+  --radius: 12px;
+  /* 圓角稍減，現代且不過分 */
 }
 
 /* 背景漸層，簡化並柔化 */
@@ -18,7 +28,7 @@ body::before {
   z-index: 0;
   inset: 0;
   pointer-events: none;
-  background: 
+  background:
     radial-gradient(ellipse 45% 35% at 15% 20%, #e9e4d766 0%, transparent 100%),
     radial-gradient(ellipse 40% 30% at 85% 70%, #d1b65633 0%, transparent 100%);
   filter: blur(36px) saturate(110%);
@@ -35,6 +45,26 @@ body {
   padding: 0;
   min-height: 100vh;
   line-height: 1.7;
+}
+
+body {
+  position: relative;
+  z-index: 1;
+  font-family: 'Inter', 'Segoe UI', 'Microsoft JhengHei', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  line-height: 1.7;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65)),
+    url('/clinic/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  /* 頁面滑動時背景不動 */
 }
 
 /* 調整 header 間距與陰影 */
@@ -63,7 +93,8 @@ header h1 {
   display: flex;
   gap: 1em;
   flex-wrap: wrap;
-  justify-content: center; /* 置中導航，增加平衡感 */
+  justify-content: center;
+  /* 置中導航，增加平衡感 */
 }
 
 .nav-bar a {
@@ -98,7 +129,8 @@ footer {
 /* 主內容區，增加邊距 */
 main {
   width: 100%;
-  max-width: 1080px; /* 增加最大寬度，適應更大螢幕 */
+  max-width: 1080px;
+  /* 增加最大寬度，適應更大螢幕 */
   margin: 0 auto;
   padding: 2em 1em;
   background: none;
@@ -123,8 +155,15 @@ main {
 
 /* Fade-in 動畫，稍減幅度 */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .dashboard:hover {
@@ -133,7 +172,9 @@ main {
 }
 
 /* 字體樣式 */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-weight: 600;
   margin-top: 0;
   letter-spacing: 0.5px;
@@ -171,7 +212,9 @@ form label {
   margin-bottom: 0.4em;
 }
 
-form input, form select, form button {
+form input,
+form select,
+form button {
   width: 100%;
   max-width: 380px;
   padding: 0.8em 1em;
@@ -183,7 +226,8 @@ form input, form select, form button {
   transition: all 0.2s ease;
 }
 
-form input:focus, form select:focus {
+form input:focus,
+form select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(209, 182, 86, 0.15);
   outline: none;
@@ -203,11 +247,13 @@ form button,
   color: #fff;
   /* 其他樣式不變 */
 }
+
 .button:hover,
 form button:hover,
 .dashboard-menu a:hover {
   background: var(--accent);
-  color: var(--primary); /* hover 時字變深色 */
+  color: var(--primary);
+  /* hover 時字變深色 */
 }
 
 /* 選單樣式，簡化動畫 */
@@ -217,7 +263,8 @@ form button:hover,
   margin: 1.5em 0;
   display: grid;
   gap: 0.8em;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 響應式網格 */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* 響應式網格 */
 }
 
 .dashboard-menu li {
@@ -250,11 +297,13 @@ form button:hover,
 }
 
 .dashboard-menu a:hover span {
-  transform: scale(1.1); /* 減輕動畫幅度 */
+  transform: scale(1.1);
+  /* 減輕動畫幅度 */
 }
 
 /* 狀態訊息 */
-.success, .error {
+.success,
+.error {
   padding: 0.9em;
   border-radius: 8px;
   margin: 1.2em 0;
@@ -262,11 +311,13 @@ form button:hover,
   font-weight: 500;
   font-size: 1em;
 }
+
 .success {
   color: #2f855a;
   background: #f0fff4;
   border: 1px solid #b2e2c6;
 }
+
 .error {
   color: #9b2c2c;
   background: #fff5f5;
@@ -279,6 +330,7 @@ a {
   text-decoration: none;
   transition: color 0.2s;
 }
+
 a:hover {
   color: var(--accent);
 }
@@ -366,6 +418,7 @@ a:hover {
   gap: 0.5em;
   margin: 0;
 }
+
 .appointment-action-form select,
 .appointment-action-form button {
   margin: 0;
