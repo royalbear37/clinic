@@ -10,19 +10,15 @@ if (!isset($_SESSION['uid']) || $_SESSION['role'] !== 'admin') {
 // 撈出所有醫師
 $doctors = $conn->query("SELECT d.doctor_id, u.name FROM doctors d JOIN users u ON d.user_id = u.id ORDER BY u.name");
 
-// 整點時間選項
-function getHourOptions() {
-    $options = [];
-    for ($h = 9; $h <= 17; $h++) {
-        $time = str_pad($h, 2, "0", STR_PAD_LEFT) . ":00";
-        $options[] = $time;
-    }
-    return $options;
-}
-$hours = getHourOptions();
+// 班別 shift 選項
+$shifts = [
+    'morning' => '早班（09:00～12:00）',
+    'afternoon' => '中班（13:00～17:00）',
+    'evening' => '晚班（17:00～20:00）'
+];
 ?>
 
-<h2>🗓️ 醫師排班管理</h2>
+<h2>🗓️ 醫師排班管理（依班別）</h2>
 
 <form method="post" action="schedule_submit.php">
     醫師：
@@ -34,17 +30,10 @@ $hours = getHourOptions();
 
     日期：<input type="date" name="schedule_date" required><br>
 
-    開始時間：
-    <select name="start_time" required>
-        <?php foreach ($hours as $h): ?>
-            <option value="<?= $h ?>"><?= $h ?></option>
-        <?php endforeach; ?>
-    </select>
-
-    結束時間：
-    <select name="end_time" required>
-        <?php foreach ($hours as $h): ?>
-            <option value="<?= $h ?>"><?= $h ?></option>
+    班別：
+    <select name="shift" required>
+        <?php foreach ($shifts as $key => $label): ?>
+            <option value="<?= $key ?>"><?= $label ?></option>
         <?php endforeach; ?>
     </select><br><br>
 

@@ -22,6 +22,7 @@ for ($i = 0; $i < 7; $i++) {
 }
 
 $doctors = $conn->query("SELECT d.doctor_id, u.name FROM doctors d JOIN users u ON d.user_id = u.id ORDER BY u.name");
+$shift_map = ['morning' => '早', 'afternoon' => '中', 'evening' => '晚'];
 ?>
 
 <?php include("../header.php"); ?>
@@ -58,7 +59,7 @@ $doctors = $conn->query("SELECT d.doctor_id, u.name FROM doctors d JOIN users u 
                 <td><?= htmlspecialchars($doc['name']) ?></td>
                 <?php foreach ($days as $d): ?>
                     <?php
-                    $stmt = $conn->prepare("SELECT schedule_id, start_time, end_time, is_available FROM schedules WHERE doctor_id = ? AND schedule_date = ?");
+                    $stmt = $conn->prepare("SELECT schedule_id, shift, is_available FROM schedules WHERE doctor_id = ? AND schedule_date = ?");
                     $stmt->bind_param("is", $doc['doctor_id'], $d);
                     $stmt->execute();
                     $rs = $stmt->get_result();
@@ -69,7 +70,8 @@ $doctors = $conn->query("SELECT d.doctor_id, u.name FROM doctors d JOIN users u 
                         $cell = "";
                         while ($s = $rs->fetch_assoc()) {
                             $icon = $s['is_available'] ? "✅" : "🚫";
-                            $cell .= "{$icon}{$s['start_time']}~{$s['end_time']}";
+                            $label = $shift_map[$s['shift']] ?? $s['shift'];
+                            $cell .= "{$icon}{$label}班";
                             if ($can_delete) {
                                 $cell .= " <a href='schedule_delete.php?schedule_id={$s['schedule_id']}&date={$date}' onclick='return confirm(\"確定要刪除這筆排班嗎？\")'>🗑️</a>";
                             }

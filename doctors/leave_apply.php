@@ -23,33 +23,24 @@ if (!$doctor) {
 $doctor_id = $doctor['doctor_id'];
 $message = "";
 
-// 整點時段：09:00 到 18:00
-function generateHourlyOptions($start = 9, $end = 18) {
-    $slots = [];
-    for ($h = $start; $h <= $end; $h++) {
-        $time = str_pad($h, 2, '0', STR_PAD_LEFT) . ":00";
-        $slots[] = $time;
-    }
-    return $slots;
-}
-$hour_options = generateHourlyOptions();
+// 班別選項
+$shifts = ['morning' => '早班', 'afternoon' => '中班', 'evening' => '晚班'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $leave_date = $_POST['leave_date'] ?? '';
-    $start_time = $_POST['start_time'] ?? '';
-    $end_time = $_POST['end_time'] ?? '';
+    $shift = $_POST['shift'] ?? '';
     $reason = $_POST['reason'] ?? '';
 
-    if (!$leave_date || !$start_time || !$end_time) {
-        $message = "❌ 請完整選擇日期與請假時段。";
-    } elseif (strtotime($start_time) >= strtotime($end_time)) {
-        $message = "❌ 開始時間不可晚於或等於結束時間。";
+    if (!$leave_date || !$shift) {
+        $message = "❌ 請選擇請假日期與班別。";
     } else {
-        $stmt = $conn->prepare("INSERT INTO schedules (doctor_id, schedule_date, start_time, end_time, is_available, note)
-                                VALUES (?, ?, ?, ?, 0, ?)");
-        $stmt->bind_param("issss", $doctor_id, $leave_date, $start_time, $end_time, $reason);
+        // 可加上避免重複插入（doctor_id, date, shift）邏輯
+        $stmt = $conn->prepare("INSERT INTO schedules (doctor_id, schedule_date, shift, is_available, note)
+                                VALUES (?, ?, ?, 0, ?)");
+        $stmt->bind_param("isss", $doctor_id, $leave_date, $shift, $reason);
         if ($stmt->execute()) {
-            $message = "✅ 已登記請假：{$leave_date} {$start_time}~{$end_time}";
+            $label = $shifts[$shift] ?? $shift;
+            $message = "✅ 已登記請假：{$leave_date}（{$label}）";
         } else {
             $message = "❌ 登記失敗：" . $stmt->error;
         }
@@ -73,18 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <input type="date" name="leave_date" required>
         </div>
         <div class="form-group">
-            <label>開始時間：</label>
-            <select name="start_time" required>
-                <?php foreach ($hour_options as $time): ?>
-                    <option value="<?= $time ?>"><?= $time ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>結束時間：</label>
-            <select name="end_time" required>
-                <?php foreach ($hour_options as $time): ?>
-                    <option value="<?= $time ?>"><?= $time ?></option>
+            <label>請假班別：</label>
+            <select name="shift" required>
+                <?php foreach ($shifts as $val => $label): ?>
+                    <option value="<?= $val ?>"><?= $label ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

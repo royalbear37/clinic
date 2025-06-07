@@ -10,25 +10,25 @@ if (!isset($_SESSION['uid']) || $_SESSION['role'] !== 'admin') {
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $doctor_id = intval($_POST['doctor_id']);
     $date = $_POST['schedule_date'];
-    $start = $_POST['start_time'];
-    $end = $_POST['end_time'];
+    $shift = $_POST['shift'];
+    $is_available = 1; // 表示這筆是排班（不是請假）
 
-    // 驗證時間順序
-    if (strtotime($start) >= strtotime($end)) {
-        echo "❌ 結束時間必須大於開始時間。";
+    $valid_shifts = ['morning', 'afternoon', 'evening'];
+    if (!in_array($shift, $valid_shifts)) {
+        echo "❌ 錯誤：無效的班別。";
         exit();
     }
 
-    // 清除當日排班
-    $stmt = $conn->prepare("DELETE FROM schedules WHERE doctor_id = ? AND schedule_date = ?");
-    $stmt->bind_param("is", $doctor_id, $date);
+    // 避免重複：刪除同日同班別
+    $stmt = $conn->prepare("DELETE FROM schedules WHERE doctor_id = ? AND schedule_date = ? AND shift = ?");
+    $stmt->bind_param("iss", $doctor_id, $date, $shift);
     $stmt->execute();
 
-    // 寫入
-    $stmt = $conn->prepare("INSERT INTO schedules (doctor_id, schedule_date, start_time, end_time, is_available) VALUES (?, ?, ?, ?, true)");
-    $stmt->bind_param("isss", $doctor_id, $date, $start, $end);
+    // 寫入排班
+    $stmt = $conn->prepare("INSERT INTO schedules (doctor_id, schedule_date, shift, is_available) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("issi", $doctor_id, $date, $shift, $is_available);
     if ($stmt->execute()) {
-        echo "✅ 排班完成：{$date} {$start}~{$end}";
+        echo "✅ 排班完成：{$date}（{$shift} shift）";
     } else {
         echo "❌ 錯誤：" . $stmt->error;
     }
