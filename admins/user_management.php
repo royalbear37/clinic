@@ -23,14 +23,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_id'])) {
     }
 }
 
-
-// 更新醫師 profile
+// 更新醫師 profile 與圖片檔名（只存檔名，不處理檔案本身）
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_doctor_id'], $_POST['new_profile'])) {
     $doctor_uid = intval($_POST['update_doctor_id']);
     $new_profile = trim($_POST['new_profile']);
-    $stmt = $conn->prepare("UPDATE doctors SET profile = ? WHERE user_id = ?");
-    $stmt->bind_param("si", $new_profile, $doctor_uid);
-    $stmt->execute();
+    $photo_url = trim($_POST['photo_url'] ?? "");
+
+    if ($photo_url !== "") {
+        $stmt_update = $conn->prepare("UPDATE doctors SET profile = ?, photo_url = ? WHERE user_id = ?");
+        $stmt_update->bind_param("ssi", $new_profile, $photo_url, $doctor_uid);
+    } else {
+        $stmt_update = $conn->prepare("UPDATE doctors SET profile = ?, photo_url = NULL WHERE user_id = ?");
+        $stmt_update->bind_param("si", $new_profile, $doctor_uid);
+    }
+    $stmt_update->execute();
 }
 
 // 搜尋 + 篩選
@@ -113,21 +119,39 @@ $result = $stmt->get_result();
             </td>
         </tr>
         <?php if ($row['role'] === 'doctor'):
-            $doctor_sql = "SELECT profile FROM doctors WHERE user_id = ?";
-            $stmt = $conn->prepare($doctor_sql);
-            $stmt->bind_param("i", $row['id']);
-            $stmt->execute();
-            $res = $stmt->get_result();
-            $doc = $res->fetch_assoc();
+            $doctor_sql = "SELECT profile, photo_url FROM doctors WHERE user_id = ?";
+            $stmt_doc = $conn->prepare($doctor_sql);
+            $stmt_doc->bind_param("i", $row['id']);
+            $stmt_doc->execute();
+            $res_doc = $stmt_doc->get_result();
+            $doc = $res_doc->fetch_assoc();
+            // 動態產生唯一 id
+            $fid = 'photo_file_' . $row['id'];
+            $tid = 'photo_url_' . $row['id'];
         ?>
         <tr>
             <td colspan="7">
-                <form method="post">
+                <form method="post" id="doctor_edit_form_<?= $row['id'] ?>">
                     醫師簡介：<br>
                     <textarea name="new_profile" rows="2" cols="100"><?= htmlspecialchars($doc['profile'] ?? '') ?></textarea><br>
+                    <label>醫師照片檔名：</label>
+                    <?php if (!empty($doc['photo_url'])): ?>
+                        <img src="/clinic/uploads/<?= htmlspecialchars($doc['photo_url']) ?>" alt="醫師照片" style="max-height:60px;">
+                    <?php endif; ?>
+                    <input type="file" id="<?= $fid ?>" style="display:none;">
+                    <input type="text" name="photo_url" id="<?= $tid ?>" value="<?= htmlspecialchars($doc['photo_url'] ?? '') ?>" placeholder="doctor_xxx.jpg">
+                    <button type="button" onclick="document.getElementById('<?= $fid ?>').click();">選擇檔案</button><br>
                     <input type="hidden" name="update_doctor_id" value="<?= $row['id'] ?>">
-                    <button type="submit">✏️ 更新簡介</button>
+                    <button type="submit">✏️ 更新簡介與照片檔名</button>
                 </form>
+                <script>
+                // JS: 檔案選取後自動填入檔名
+                document.getElementById('<?= $fid ?>').addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        document.getElementById('<?= $tid ?>').value = this.files[0].name;
+                    }
+                });
+                </script>
             </td>
         </tr>
         <?php endif; ?>
