@@ -23,7 +23,7 @@ if (session_status() === PHP_SESSION_NONE) {
             <h1 style="margin:0 24px 0 0;flex-shrink:0;">診所資訊系統</h1>
             <nav class="nav-bar" style="flex:1;">
                 <a href="/clinic/index.php">🏠 首頁</a>
-                <a href="/clinic/front_page/about.php">🏥 關於醫院</a>
+                <a href="/clinic/about.php">🏥 關於醫院</a>
                 <a href="/clinic/doctors/intro.php">👨‍⚕️ 醫師簡介</a>
                 <?php if (isset($_SESSION['role'])): ?>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
