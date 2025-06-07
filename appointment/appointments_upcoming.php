@@ -26,10 +26,10 @@ $doctor_id = $doctor['doctor_id'];
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'], $_POST['new_status'])) {
     $appointment_id = intval($_POST['appointment_id']);
     $new_status = $_POST['new_status'];
-    $valid_statuses = ['checked-in', 'completed', 'no-show', 'cancelled'];
+    $valid_statuses = ['checked_in', 'completed', 'no-show', 'cancelled'];
 
     if (in_array($new_status, $valid_statuses)) {
-        if ($new_status === 'checked-in') {
+        if ($new_status === 'checked_in') {
             $stmt = $conn->prepare("UPDATE appointments SET status = ?, checkin_time = NOW() WHERE appointment_id = ? AND doctor_id = ?");
         } else {
             $stmt = $conn->prepare("UPDATE appointments SET status = ? WHERE appointment_id = ? AND doctor_id = ?");
@@ -105,7 +105,7 @@ $result = $stmt->get_result();
                         <form method="post" class="appointment-action-form">
                             <input type="hidden" name="appointment_id" value="<?= $row['appointment_id'] ?>">
                             <select name="new_status">
-                                <option value="checked-in" <?= $row['status'] === 'checked_in' ? 'selected' : '' ?>>✔️ 報到</option>
+                                <option value="checked_in" <?= $row['status'] === 'checked_in' ? 'selected' : '' ?>>✔️ 報到</option>
                                 <option value="completed" <?= $row['status'] === 'completed' ? 'selected' : '' ?>>✅ 完成</option>
                                 <option value="no-show" <?= $row['status'] === 'no-show' ? 'selected' : '' ?>>❌ 病患未到</option>
                                 <option value="cancelled" <?= $row['status'] === 'cancelled' ? 'selected' : '' ?>>❎ 取消</option>

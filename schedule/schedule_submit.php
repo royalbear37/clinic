@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $success = 0;
     $fail = 0;
+    $duplicate = 0;
 
     // 取得開始日期的時間戳
     $start_ts = strtotime($week_start);
@@ -28,10 +29,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $date = date('Y-m-d', $start_ts + ($d * 86400));
         foreach ($valid_shifts as $shift) {
             if (isset($schedule[$shift][$d])) {
-                // 避免重複：刪除同日同班別
-                $stmt = $conn->prepare("DELETE FROM schedules WHERE doctor_id = ? AND schedule_date = ? AND shift = ?");
+                // 先檢查是否已存在相同資料
+                $stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM schedules WHERE doctor_id = ? AND schedule_date = ? AND shift = ?");
                 $stmt->bind_param("iss", $doctor_id, $date, $shift);
                 $stmt->execute();
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                if ($row['cnt'] > 0) {
+                    $duplicate++;
+                    continue; // 跳過重複
+                }
 
                 // 寫入排班
                 $stmt = $conn->prepare("INSERT INTO schedules (doctor_id, schedule_date, shift, is_available) VALUES (?, ?, ?, ?)");
@@ -46,8 +53,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     echo "<h2>排班結果</h2>";
-    echo "<p>✅ 排班完成！成功 $success 筆，失敗 $fail 筆。</p>";
+    echo "<p>✅ 排班完成！成功 $success 筆，失敗 $fail 筆，重複 $duplicate 筆未新增。</p>";
     echo "<p><a href='schedule_manage.php' class='button'>🔙 返回排班管理</a></p>";
+
+    // 查詢本週班表
+    $dates = [];
+    for ($d = 0; $d < 7; $d++) {
+        $dates[] = date('Y-m-d', $start_ts + ($d * 86400));
+    }
+    $show_schedule = [];
+    $in = implode(',', array_fill(0, count($dates), '?'));
+    $types = str_repeat('s', count($dates));
+    $params = $dates;
+    array_unshift($params, $doctor_id);
+    $stmt = $conn->prepare("SELECT schedule_date, shift FROM schedules WHERE doctor_id = ? AND schedule_date IN ($in)");
+    $stmt->bind_param('i'.$types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $show_schedule[$row['schedule_date']][$row['shift']] = true;
+    }
+
+    // 顯示本週班表
+    echo "<h3>本週班表總覽</h3>";
+    echo "<table border='1' cellpadding='4' style='font-size:0.95em;'>";
+    echo "<tr><th>日期</th><th>早班</th><th>中班</th><th>晚班</th></tr>";
+    foreach ($dates as $d) {
+        echo "<tr><td>$d</td>";
+        foreach (['morning','afternoon','evening'] as $shift) {
+            echo "<td>" . (isset($show_schedule[$d][$shift]) ? '✅' : '') . "</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table>";
+
     echo '</div>';
 }
 
