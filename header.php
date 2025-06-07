@@ -68,25 +68,7 @@ while ($doc = $doc_rs->fetch_assoc()) {
             <nav class="nav-bar" style="flex:1;">
                 <a href="/clinic/index.php">🏠 首頁</a>
                 <a href="/clinic/about.php">🏥 關於醫院</a>
-                <div class="dropdown">
-                    <a href="/clinic/doctors/intro.php">👨‍⚕️ 醫師簡介 ▼</a>
-                    <ul class="dropdown-content">
-                        <?php foreach ($departments as $dept_id => $dept): ?>
-                        <li class="dropdown-sub">
-                            <a href="#"><?= htmlspecialchars($dept['name']) ?> ▶</a>
-                            <ul class="dropdown-sub-content">
-                                <?php foreach ($dept['doctors'] as $doc): ?>
-                                    <li>
-                                        <a href="/clinic/doctors/intro.php?doctor_id=<?= $doc['doctor_id'] ?>">
-                                            <?= htmlspecialchars($doc['name']) ?>
-                                        </a>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
+                <a href="/clinic/doctors/intro.php">👨‍⚕️ 醫師簡介</a>
                 <?php if (isset($_SESSION['role'])): ?>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
                         <a href="/clinic/admins/dashboard.php">🛠️ 管理員首頁</a>
