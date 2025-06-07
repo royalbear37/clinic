@@ -1,3 +1,4 @@
+##  專案建置步驟
 clone到之前作業用的AppServ/www資料夾裡面  
 ****
 在瀏覽器輸入localhost/clinic/users/login.php進到登入頁面  
@@ -8,8 +9,8 @@ clone到之前作業用的AppServ/www資料夾裡面
 ****
 一開始db裡面沒有任何使用者，要先自己建  
 ****
-AI機器人
-/n
+##  AI 機器人功能設定
+
 打開你的：C:\AppServ\php7\php.ini
 ****
 搜尋：curl.cainfo
