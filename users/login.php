@@ -25,6 +25,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['user_id'] = $checkRow['user_id'];
                 $_SESSION['role'] = $role;
                 $_SESSION['name'] = $checkRow['name'];
+                session_start();
+                if ($_SERVER["REQUEST_METHOD"] === "POST") {
+                    if (!isset($_POST['captcha_input']) || $_POST['captcha_input'] !== $_SESSION['captcha']) {
+                        die("❌ 驗證碼錯誤，請重新輸入。");
+                    }
+
+                    // ...這裡才是驗證帳號密碼的邏輯
+                }
 
                 header("Location: /clinic/{$role}s/dashboard.php");
                 exit();
@@ -40,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<link rel="stylesheet" href="/clinic/style.css"> 
+<link rel="stylesheet" href="/clinic/style.css">
 
 <h2>診所系統登入</h2>
 
@@ -56,8 +64,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <option value="admin">管理員</option>
     </select><br><br>
     <button type="submit">登入</button>
+    <br>
+    <label for="captcha_input">驗證碼：</label><br>
+    <img src="captcha.php" alt="驗證碼圖片"><br>
+    <input type="text" name="captcha_input" required placeholder="請輸入上方驗證碼"><br><br>
+
 </form>
 
 <p>還沒有帳號？<a href="register.php">註冊</a></p>
 
-<?php include("../footer.php"); // 新增這行 ?>
+<?php include("../footer.php"); // 新增這行 
+?>

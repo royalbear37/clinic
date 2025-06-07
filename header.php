@@ -5,18 +5,20 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>診所系統</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/clinic/style.css">
 </head>
+
 <body>
     <header>
-        <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="container" style="display:flex;align-items:center;justify-content:flex-start;">
             <!-- 左側LOGO，請將logo.png放在/clinic/images/logo.png -->
-            <a href="/clinic/index.php" style="display:inline-block;margin-right:18px;">
-                <img src="/clinic/images/logo.png" alt="醫院LOGO" style="height:48px;vertical-align:middle;">
+            <a href="/clinic/index.php" style="display:flex;align-items:center;margin-right:18px;">
+                <img src="/clinic/logo.png" alt="醫院LOGO" style="height:100px;vertical-align:middle;">
             </a>
             <h1 style="margin:0 24px 0 0;flex-shrink:0;">診所資訊系統</h1>
             <nav class="nav-bar" style="flex:1;">
