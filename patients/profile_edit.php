@@ -45,6 +45,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->execute();
 
     $message = "✅ 資料更新成功！";
+
+    // 重新查詢最新資料
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $info = $result->fetch_assoc();
 }
 ?>
 
