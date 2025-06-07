@@ -2,7 +2,6 @@ DROP DATABASE IF EXISTS clinic_db;
 CREATE DATABASE clinic_db;
 USE clinic_db;
 
--- 使用者帳號表
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id VARCHAR(20) NOT NULL UNIQUE,
@@ -14,7 +13,6 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 病患資料表（FK ON DELETE CASCADE）
 CREATE TABLE patients (
   patient_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -25,7 +23,6 @@ CREATE TABLE patients (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 科別資料表
 CREATE TABLE departments (
   department_id INT PRIMARY KEY,
   name VARCHAR(50) NOT NULL
@@ -38,7 +35,6 @@ INSERT INTO departments (department_id, name) VALUES
 (104, '皮膚科'),
 (105, '骨科');
 
--- 醫師資料表（user_id 為 INT 並設 ON DELETE CASCADE）
 CREATE TABLE doctors (
   doctor_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -51,7 +47,6 @@ CREATE TABLE doctors (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 管理員資料表（user_id 為 INT 並設 ON DELETE CASCADE）
 CREATE TABLE admins (
   admin_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -59,7 +54,6 @@ CREATE TABLE admins (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 預約資料表
 CREATE TABLE appointments (
   appointment_id INT AUTO_INCREMENT PRIMARY KEY,
   patient_id INT,
@@ -78,7 +72,6 @@ CREATE TABLE appointments (
   FOREIGN KEY (modified_by_admin_id) REFERENCES admins(admin_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 意見回饋表
 CREATE TABLE feedback (
   feedback_id INT AUTO_INCREMENT PRIMARY KEY,
   appointment_id INT NOT NULL,
@@ -88,19 +81,16 @@ CREATE TABLE feedback (
   FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---醫師排班
 CREATE TABLE schedules (
     schedule_id INT AUTO_INCREMENT PRIMARY KEY,
     doctor_id INT NOT NULL,
     schedule_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
+    shift ENUM('morning', 'afternoon', 'evening') NOT NULL,
     is_available BOOLEAN NOT NULL DEFAULT TRUE,
     note TEXT,
     FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON DELETE CASCADE
-);ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---通知病患
 CREATE TABLE notifications (
   notification_id INT AUTO_INCREMENT PRIMARY KEY,
   appointment_id INT,
