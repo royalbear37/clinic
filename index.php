@@ -21,4 +21,4 @@
     </div>
     <p style="color:#bfae8a; margin-top:2em;">© 2025 診所資訊系統</p>
 </div>
-<?php include("footer.php"); ?>
+<?php include("footer.php"); ?>   
