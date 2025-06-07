@@ -1,4 +1,3 @@
-
 <?php include("../header.php"); ?>
 <div class="dashboard" style="max-width:700px;margin:40px auto;">
     <h2>🏥 關於本院</h2>
