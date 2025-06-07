@@ -8,9 +8,8 @@ clone到之前作業用的AppServ/www資料夾裡面
 ****
 一開始db裡面沒有任何使用者，要先自己建  
 ****
-****
 AI機器人
-****
+/n
 打開你的：C:\AppServ\php7\php.ini
 ****
 搜尋：curl.cainfo
