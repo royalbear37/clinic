@@ -62,6 +62,9 @@ $result = $stmt->get_result();
                 <td>
                     <?php
                         if ($row['status'] === 'scheduled') echo '<span style="color:#227d3b;">預約中</span>';
+                        elseif ($row['status'] === 'checked_in') echo '<span style="color:#2b6cb0;">已報到</span>';
+                        elseif ($row['status'] === 'completed') echo '<span style="color:#555;">已完成</span>';
+                        elseif ($row['status'] === 'no-show') echo '<span style="color:#a94442;">未到</span>';
                         elseif ($row['status'] === 'cancelled') echo '<span style="color:#a94442;">已取消</span>';
                         else echo htmlspecialchars($row['status']);
                     ?>
