@@ -37,7 +37,7 @@ $result = $stmt->get_result();
 
 <?php include("../header.php"); ?>
 <div class="dashboard" style="max-width:900px;margin:40px auto;">
-    <h2 style="text-align:center;">🗓 我的預約紀錄</h2>
+    <h2 style="text-align:center;">🗓 報到/預約紀錄</h2>
     <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;background:#fffdfa;">
         <thead>
@@ -68,6 +68,7 @@ $result = $stmt->get_result();
                 </td>
                 <td>
                     <?php if ($row['status'] === 'scheduled'): ?>
+                        <a href="appointment_checkin.php?id=<?= $row['appointment_id'] ?>" class="button" style="padding:0.3em 1em;font-size:0.95em;background:#337ab7;" onclick="return confirm('確定要報到嗎？');">報到</a>
                         <a href="appointment_cancel.php?id=<?= $row['appointment_id'] ?>" class="button" style="padding:0.3em 1em;font-size:0.95em;" onclick="return confirm('確定要取消這筆預約嗎？');">取消</a>
                     <?php else: ?>
                         -

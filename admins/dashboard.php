@@ -10,6 +10,7 @@ include("../header.php");
         <li><a href="/clinic/schedule/schedule_manage.php">📅 醫師排班設定</a></li>
         <li><a href="/clinic/schedule/schedule_overview.php">🗓️ 排班狀況總覽</a></li>
         <li><a href="/clinic/notifications/notifications_generate.php">📂 產生明日預約通知</a></li>
+        <li><a href="/clinic/appointment/auto_noshow.php">📋 未到管理</a></li>
     </ul>
     <h3>📊 管理員報表</h3>
     <ul class="dashboard-menu">
