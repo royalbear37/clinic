@@ -22,21 +22,22 @@ $stmt->bind_param("i", $appointment_id);
 $stmt->execute();
 $res = $stmt->get_result();
 $appointment = $res->fetch_assoc();
-// 查詢是否已有處方
-$prescription_sql = "SELECT * FROM prescriptions WHERE appointment_id = ?";
-$stmt = $conn->prepare($prescription_sql);
-$stmt->bind_param("i", $appointment_id);
-$stmt->execute();
-$prescription_result = $stmt->get_result();
-$prescription = $prescription_result->fetch_assoc();
+// 查詢現有處方（如果有）
+$pres_sql = "SELECT medication, notes FROM prescriptions WHERE appointment_id = ?";
+$stmt_pres = $conn->prepare($pres_sql);
+$stmt_pres->bind_param("i", $appointment_id);
+$stmt_pres->execute();
+$pres_result = $stmt_pres->get_result();
+$existing_prescription = $pres_result->fetch_assoc();
 
-$selected_meds = [];
-$existing_notes = '';
+$previous_meds = [];
+$previous_notes = '';
 
-if ($prescription) {
-    $selected_meds = explode(',', $prescription['medication']); // 例如：["Paracetamol", "Amlodipine"]
-    $existing_notes = $prescription['notes'];
+if ($existing_prescription) {
+    $previous_meds = explode(', ', $existing_prescription['medication']);
+    $previous_notes = $existing_prescription['notes'];
 }
+
 
 if (!$appointment) {
     die("❌ 找不到預約資料");
@@ -105,31 +106,39 @@ if ($appointment['status'] !== 'completed') {
                 <input type="hidden" name="patient_id" value="<?= $appointment['patient_id'] ?>">
 
                 <div class="form-group">
-                    <label style="font-size:1.2em; font-weight:bold;">選擇藥品：</label>
+                    <label>選擇藥品：</label><br>
+
                     <table class="med-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60%;">藥品名稱</th>
+                                <th style="width:40%;">選擇</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <?php
                             $med_sql = "SELECT med_id, name FROM medications";
                             $med_result = $conn->query($med_sql);
                             while ($med = $med_result->fetch_assoc()):
+                                $checked = in_array($med['name'], $previous_meds) ? 'checked' : '';
                             ?>
                                 <tr>
-                                    <td class="med-name"><?= htmlspecialchars($med['name']) ?></td>
-                                    <td class="med-check">
-                                        <input type="checkbox" name="medication[]" value="<?= htmlspecialchars($med['name']) ?>"
-                                            <?= in_array($med['name'], $selected_meds) ? 'checked' : '' ?>>
+                                    <td><?= htmlspecialchars($med['name']) ?></td>
+                                    <td style="text-align:center;">
+                                        <input type="checkbox" name="medication[]" value="<?= htmlspecialchars($med['name']) ?>" <?= $checked ?>>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
-
                         </tbody>
                     </table>
                 </div>
 
 
+
                 <div class="form-group">
-                    <label>備註：</label>
-                    <textarea name="notes" rows="3" style="width:100%; ..."><?= htmlspecialchars($existing_notes) ?></textarea>
+                    <label>備註：</label><br>
+                    <textarea name="notes" rows="3" style="width:100%;"><?= htmlspecialchars($previous_notes) ?></textarea><br><br>
+
                 </div>
 
                 <div style="text-align:center;">
