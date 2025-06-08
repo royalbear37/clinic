@@ -302,3 +302,163 @@ VALUES (
     '1',
     "9.jpg"
   );
+-- 10位病患 user
+INSERT INTO users (user_id, id_number, password, role, name, email)
+VALUES
+  ('pat201', 'P123456781', '$2y$10$abcde1', 'patient', '王小明', 'pat201@example.com'),
+  ('pat202', 'P123456782', '$2y$10$abcde2', 'patient', '李小美', 'pat202@example.com'),
+  ('pat203', 'P123456783', '$2y$10$abcde3', 'patient', '張大華', 'pat203@example.com'),
+  ('pat204', 'P123456784', '$2y$10$abcde4', 'patient', '陳怡君', 'pat204@example.com'),
+  ('pat205', 'P123456785', '$2y$10$abcde5', 'patient', '林志強', 'pat205@example.com'),
+  ('pat206', 'P123456786', '$2y$10$abcde6', 'patient', '黃美麗', 'pat206@example.com'),
+  ('pat207', 'P123456787', '$2y$10$abcde7', 'patient', '吳建國', 'pat207@example.com'),
+  ('pat208', 'P123456788', '$2y$10$abcde8', 'patient', '周雅婷', 'pat208@example.com'),
+  ('pat209', 'P123456789', '$2y$10$abcde9', 'patient', '許文豪', 'pat209@example.com'),
+  ('pat210', 'P123456780', '$2y$10$abcde0', 'patient', '鄭偉哲', 'pat210@example.com');
+
+-- 10位病患 patient
+INSERT INTO patients (user_id, id_number, phone, gender, birthdate)
+VALUES
+  ((SELECT id FROM users WHERE user_id='pat201'), 'P123456781', '0911000001', 'male', '1990-01-01'),
+  ((SELECT id FROM users WHERE user_id='pat202'), 'P123456782', '0911000002', 'female', '1992-02-02'),
+  ((SELECT id FROM users WHERE user_id='pat203'), 'P123456783', '0911000003', 'male', '1988-03-03'),
+  ((SELECT id FROM users WHERE user_id='pat204'), 'P123456784', '0911000004', 'female', '1995-04-04'),
+  ((SELECT id FROM users WHERE user_id='pat205'), 'P123456785', '0911000005', 'male', '1991-05-05'),
+  ((SELECT id FROM users WHERE user_id='pat206'), 'P123456786', '0911000006', 'female', '1993-06-06'),
+  ((SELECT id FROM users WHERE user_id='pat207'), 'P123456787', '0911000007', 'male', '1989-07-07'),
+  ((SELECT id FROM users WHERE user_id='pat208'), 'P123456788', '0911000008', 'female', '1994-08-08'),
+  ((SELECT id FROM users WHERE user_id='pat209'), 'P123456789', '0911000009', 'male', '1996-09-09'),
+  ((SELECT id FROM users WHERE user_id='pat210'), 'P123456780', '0911000010', 'male', '1997-10-10');
+
+
+-- 6/8~6/14 班表（同一醫師一天可多班）
+INSERT INTO schedules (doctor_id, schedule_date, shift, is_available, note) VALUES
+-- 林小芳 (doctor_id=1, 眼科)
+(1, '2025-06-08', 'morning', 1, NULL),
+(1, '2025-06-08', 'afternoon', 1, NULL),
+(1, '2025-06-09', 'morning', 1, NULL),
+(1, '2025-06-09', 'evening', 1, NULL),
+(1, '2025-06-10', 'morning', 1, NULL),
+(1, '2025-06-10', 'afternoon', 1, NULL),
+(1, '2025-06-11', 'evening', 1, NULL),
+(1, '2025-06-12', 'morning', 1, NULL),
+(1, '2025-06-12', 'afternoon', 1, NULL),
+(1, '2025-06-13', 'morning', 1, NULL),
+(1, '2025-06-13', 'evening', 1, NULL),
+(1, '2025-06-14', 'afternoon', 1, NULL),
+
+-- 李小華 (doctor_id=2, 眼科)
+(2, '2025-06-08', 'morning', 1, NULL),
+(2, '2025-06-08', 'evening', 1, NULL),
+(2, '2025-06-09', 'afternoon', 1, NULL),
+(2, '2025-06-10', 'morning', 1, NULL),
+(2, '2025-06-10', 'evening', 1, NULL),
+(2, '2025-06-11', 'morning', 1, NULL),
+(2, '2025-06-12', 'evening', 1, NULL),
+(2, '2025-06-13', 'afternoon', 1, NULL),
+(2, '2025-06-14', 'morning', 1, NULL),
+(2, '2025-06-14', 'evening', 1, NULL),
+
+-- 陳美麗 (doctor_id=3, 耳鼻喉科)
+(3, '2025-06-08', 'morning', 1, NULL),
+(3, '2025-06-08', 'afternoon', 1, NULL),
+(3, '2025-06-09', 'morning', 1, NULL),
+(3, '2025-06-09', 'evening', 1, NULL),
+(3, '2025-06-10', 'morning', 1, NULL),
+(3, '2025-06-10', 'afternoon', 1, NULL),
+(3, '2025-06-11', 'evening', 1, NULL),
+(3, '2025-06-12', 'morning', 1, NULL),
+(3, '2025-06-12', 'afternoon', 1, NULL),
+(3, '2025-06-13', 'morning', 1, NULL),
+(3, '2025-06-13', 'evening', 1, NULL),
+(3, '2025-06-14', 'afternoon', 1, NULL),
+
+-- 張志強 (doctor_id=4, 耳鼻喉科)
+(4, '2025-06-08', 'morning', 1, NULL),
+(4, '2025-06-08', 'evening', 1, NULL),
+(4, '2025-06-09', 'afternoon', 1, NULL),
+(4, '2025-06-10', 'morning', 1, NULL),
+(4, '2025-06-10', 'evening', 1, NULL),
+(4, '2025-06-11', 'morning', 1, NULL),
+(4, '2025-06-12', 'evening', 1, NULL),
+(4, '2025-06-13', 'afternoon', 1, NULL),
+(4, '2025-06-14', 'morning', 1, NULL),
+(4, '2025-06-14', 'evening', 1, NULL),
+
+-- 王大明 (doctor_id=5, 小兒科)
+(5, '2025-06-08', 'morning', 1, NULL),
+(5, '2025-06-08', 'afternoon', 1, NULL),
+(5, '2025-06-09', 'morning', 1, NULL),
+(5, '2025-06-09', 'evening', 1, NULL),
+(5, '2025-06-10', 'morning', 1, NULL),
+(5, '2025-06-10', 'afternoon', 1, NULL),
+(5, '2025-06-11', 'evening', 1, NULL),
+(5, '2025-06-12', 'morning', 1, NULL),
+(5, '2025-06-12', 'afternoon', 1, NULL),
+(5, '2025-06-13', 'morning', 1, NULL),
+(5, '2025-06-13', 'evening', 1, NULL),
+(5, '2025-06-14', 'afternoon', 1, NULL),
+
+-- 黃偉哲 (doctor_id=6, 小兒科)
+(6, '2025-06-08', 'morning', 1, NULL),
+(6, '2025-06-08', 'evening', 1, NULL),
+(6, '2025-06-09', 'afternoon', 1, NULL),
+(6, '2025-06-10', 'morning', 1, NULL),
+(6, '2025-06-10', 'evening', 1, NULL),
+(6, '2025-06-11', 'morning', 1, NULL),
+(6, '2025-06-12', 'evening', 1, NULL),
+(6, '2025-06-13', 'afternoon', 1, NULL),
+(6, '2025-06-14', 'morning', 1, NULL),
+(6, '2025-06-14', 'evening', 1, NULL),
+
+-- 吳怡君 (doctor_id=7, 皮膚科)
+(7, '2025-06-08', 'morning', 1, NULL),
+(7, '2025-06-08', 'afternoon', 1, NULL),
+(7, '2025-06-09', 'morning', 1, NULL),
+(7, '2025-06-09', 'evening', 1, NULL),
+(7, '2025-06-10', 'morning', 1, NULL),
+(7, '2025-06-10', 'afternoon', 1, NULL),
+(7, '2025-06-11', 'evening', 1, NULL),
+(7, '2025-06-12', 'morning', 1, NULL),
+(7, '2025-06-12', 'afternoon', 1, NULL),
+(7, '2025-06-13', 'morning', 1, NULL),
+(7, '2025-06-13', 'evening', 1, NULL),
+(7, '2025-06-14', 'afternoon', 1, NULL),
+
+-- 周建國 (doctor_id=8, 皮膚科)
+(8, '2025-06-08', 'morning', 1, NULL),
+(8, '2025-06-08', 'evening', 1, NULL),
+(8, '2025-06-09', 'afternoon', 1, NULL),
+(8, '2025-06-10', 'morning', 1, NULL),
+(8, '2025-06-10', 'evening', 1, NULL),
+(8, '2025-06-11', 'morning', 1, NULL),
+(8, '2025-06-12', 'evening', 1, NULL),
+(8, '2025-06-13', 'afternoon', 1, NULL),
+(8, '2025-06-14', 'morning', 1, NULL),
+(8, '2025-06-14', 'evening', 1, NULL),
+
+-- 許雅婷 (doctor_id=9, 骨科)
+(9, '2025-06-08', 'morning', 1, NULL),
+(9, '2025-06-08', 'afternoon', 1, NULL),
+(9, '2025-06-09', 'morning', 1, NULL),
+(9, '2025-06-09', 'evening', 1, NULL),
+(9, '2025-06-10', 'morning', 1, NULL),
+(9, '2025-06-10', 'afternoon', 1, NULL),
+(9, '2025-06-11', 'evening', 1, NULL),
+(9, '2025-06-12', 'morning', 1, NULL),
+(9, '2025-06-12', 'afternoon', 1, NULL),
+(9, '2025-06-13', 'morning', 1, NULL),
+(9, '2025-06-13', 'evening', 1, NULL),
+(9, '2025-06-14', 'afternoon', 1, NULL),
+
+-- 鄭文豪 (doctor_id=10, 骨科)
+(10, '2025-06-08', 'morning', 1, NULL),
+(10, '2025-06-08', 'evening', 1, NULL),
+(10, '2025-06-09', 'afternoon', 1, NULL),
+(10, '2025-06-10', 'morning', 1, NULL),
+(10, '2025-06-10', 'evening', 1, NULL),
+(10, '2025-06-11', 'morning', 1, NULL),
+(10, '2025-06-12', 'evening', 1, NULL),
+(10, '2025-06-13', 'afternoon', 1, NULL),
+(10, '2025-06-14', 'morning', 1, NULL),
+(10, '2025-06-14', 'evening', 1, NULL);

@@ -26,7 +26,10 @@ for ($i = 0; $i < 7; $i++) {
     $days[] = date('Y-m-d', strtotime("+{$i} day", strtotime($base_date)));
 }
 
-// 只撈該科別的醫師
+$shift_map = ['morning' => '早班', 'afternoon' => '中班', 'evening' => '晚班'];
+$shifts = ['morning', 'afternoon', 'evening'];
+
+// 取得所有醫師（可依科別過濾）
 $doctor_sql = "SELECT d.doctor_id, u.name FROM doctors d JOIN users u ON d.user_id = u.id";
 if ($department_id) {
     $doctor_sql .= " WHERE d.department_id = ?";
@@ -38,7 +41,20 @@ if ($department_id) {
     $doctor_sql .= " ORDER BY u.name";
     $doctors = $conn->query($doctor_sql);
 }
-$shift_map = ['morning' => '早', 'afternoon' => '中', 'evening' => '晚'];
+
+// 取得該週所有班表
+$schedule_data = [];
+$schedule_rs = $conn->query(
+    "SELECT s.schedule_date, s.shift, u.name 
+     FROM schedules s 
+     JOIN doctors d ON s.doctor_id = d.doctor_id 
+     JOIN users u ON d.user_id = u.id
+     WHERE s.schedule_date BETWEEN '{$days[0]}' AND '{$days[6]}'"
+    . ($department_id ? " AND d.department_id = " . intval($department_id) : "")
+);
+while ($row = $schedule_rs->fetch_assoc()) {
+    $schedule_data[$row['shift']][$row['schedule_date']][] = $row['name'];
+}
 ?>
 
 <?php include("../header.php"); ?>
@@ -57,56 +73,28 @@ $shift_map = ['morning' => '早', 'afternoon' => '中', 'evening' => '晚'];
         <button type="submit" class="button">切換週</button>
     </form>
 
-    <?php if ($_SESSION['role'] === 'admin'): ?>
-        <button onclick="document.getElementById('copy_form').style.display='block'; this.style.display='none';" class="button" style="margin-bottom:1em;">
-            ➕ 複製班表
-        </button>
-        <div id="copy_form" style="display:none; margin-top: 1em;">
-            <form method="post" action="schedule_copy_week.php">
-                複製來源週（任意一天）：
-                <input type="date" name="source_date" required>
-                ➡️ 複製到目標週（任意一天）：
-                <input type="date" name="target_date" required>
-                <button type="submit" class="button">執行複製</button>
-            </form>
-        </div>
-    <?php endif; ?>
-
     <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;background:#fffdfa;">
+    <table style="width:100%;border-collapse:collapse;background:#fffdfa; border:2px solid #bbb;">
         <tr style="background: #f7f5f2; color: #23272f;">
-            <th>醫師</th>
-            <?php foreach ($days as $d) echo "<th>{$d}</th>"; ?>
+            <th style="border:1px solid #bbb;padding:8px;">班別＼日期</th>
+            <?php foreach ($days as $d) echo "<th style='border:1px solid #bbb;padding:8px;'>{$d}</th>"; ?>
         </tr>
-        <?php while ($doc = $doctors->fetch_assoc()): ?>
+        <?php foreach ($shifts as $shift): ?>
             <tr style="text-align:center;">
-                <td><?= htmlspecialchars($doc['name']) ?></td>
+                <td style="font-weight:bold;border:1px solid #bbb;padding:8px;"><?= $shift_map[$shift] ?></td>
                 <?php foreach ($days as $d): ?>
-                    <?php
-                    $stmt = $conn->prepare("SELECT schedule_id, shift, is_available FROM schedules WHERE doctor_id = ? AND schedule_date = ?");
-                    $stmt->bind_param("is", $doc['doctor_id'], $d);
-                    $stmt->execute();
-                    $rs = $stmt->get_result();
-
-                    if ($rs->num_rows === 0) {
-                        echo "<td>❌</td>";
-                    } else {
-                        $cell = "";
-                        while ($s = $rs->fetch_assoc()) {
-                            $icon = $s['is_available'] ? "✅" : "🚫";
-                            $label = $shift_map[$s['shift']] ?? $s['shift'];
-                            $cell .= "{$icon}{$label}班";
-                            if ($can_delete) {
-                                $cell .= " <a href='schedule_delete.php?schedule_id={$s['schedule_id']}&date={$date}' onclick='return confirm(\"確定要刪除這筆排班嗎？\")'>🗑️</a>";
-                            }
-                            $cell .= "<br>";
+                    <td style="border:1px solid #bbb;padding:8px;">
+                        <?php
+                        if (!empty($schedule_data[$shift][$d])) {
+                            echo implode('<br>', array_map('htmlspecialchars', $schedule_data[$shift][$d]));
+                        } else {
+                            echo '—';
                         }
-                        echo "<td>{$cell}</td>";
-                    }
-                    ?>
+                        ?>
+                    </td>
                 <?php endforeach; ?>
             </tr>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </table>
     </div>
 

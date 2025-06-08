@@ -25,11 +25,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     echo '<div class="dashboard" style="max-width:600px;margin:40px auto;">';
 
+    // 過濾同一醫師同一天同一班別重複
+    $already = [];
     for ($d = 0; $d < 7; $d++) {
         $date = date('Y-m-d', $start_ts + ($d * 86400));
         foreach ($valid_shifts as $shift) {
             if (isset($schedule[$shift][$d])) {
-                // 先檢查是否已存在相同資料
+                $key = $doctor_id . '_' . $date . '_' . $shift;
+                if (isset($already[$key])) {
+                    $duplicate++;
+                    continue; // 跳過同一表單重複
+                }
+                $already[$key] = true;
+
+                // 先檢查資料庫是否已存在
                 $stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM schedules WHERE doctor_id = ? AND schedule_date = ? AND shift = ?");
                 $stmt->bind_param("iss", $doctor_id, $date, $shift);
                 $stmt->execute();
@@ -37,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $row = $result->fetch_assoc();
                 if ($row['cnt'] > 0) {
                     $duplicate++;
-                    continue; // 跳過重複
+                    continue; // 跳過資料庫重複
                 }
 
                 // 寫入排班
