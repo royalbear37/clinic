@@ -7,10 +7,22 @@ if (!isset($_SESSION['uid']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// 若透過月份選單切換
-$selected_month = $_GET['month'] ?? date('Y-m');
-$start_date = $selected_month . '-01';
-$end_date = date('Y-m-t', strtotime($start_date));
+// 報表類型
+$type = $_GET['type'] ?? 'daily';
+
+// 日期選擇
+if ($type === 'weekly') {
+    $selected_week = $_GET['week'] ?? date('o-\WW');
+    // 取得本週的週一和週日
+    $dt = new DateTime();
+    $dt->setISODate(substr($selected_week, 0, 4), substr($selected_week, 6, 2));
+    $start_date = $dt->format('Y-m-d');
+    $dt->modify('+6 days');
+    $end_date = $dt->format('Y-m-d');
+} else {
+    $selected_date = $_GET['date'] ?? date('Y-m-d');
+    $start_date = $end_date = $selected_date;
+}
 
 // 查詢資料
 $sql = "SELECT d.department_id, dep.name AS department_name, u.name AS doctor_name, COUNT(*) AS count
@@ -39,22 +51,28 @@ while ($row = $result->fetch_assoc()) {
 
 <?php include("../header.php"); ?>
 <div class="dashboard" style="max-width:900px;margin:40px auto;">
-    <h2 style="text-align:center;">📅 預約統計報表（依月份）</h2>
+    <h2 style="text-align:center;">📅 預約統計報表（每日/每週）</h2>
 
-    <form method="get" style="text-align:center;margin-bottom:1.5em;">
-        <label>選擇月份：</label>
-        <select name="month" onchange="this.form.submit()">
-            <?php
-            $current_year = date('Y');
-            for ($m = 1; $m <= 12; $m++):
-                $month_val = $current_year . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
-            ?>
-                <option value="<?= $month_val ?>" <?= $month_val == $selected_month ? 'selected' : '' ?>>
-                    <?= $month_val ?>
-                </option>
-            <?php endfor; ?>
-        </select>
-    </form>
+    <div style="background:#fff;padding:32px 32px 24px 32px;border-radius:16px;box-shadow:0 2px 12px #eee;max-width:500px;margin:0 auto 2em auto;">
+        <form method="get" style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+            <div style="display:flex;align-items:center;gap:12px;width:100%;">
+                <label style="white-space:nowrap;">報表類型：</label>
+                <select name="type" onchange="this.form.submit()" style="flex:1;padding:8px 12px;">
+                    <option value="daily" <?= $type === 'daily' ? 'selected' : '' ?>>每日</option>
+                    <option value="weekly" <?= $type === 'weekly' ? 'selected' : '' ?>>每週</option>
+                </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;width:100%;">
+                <?php if ($type === 'weekly'): ?>
+                    <label style="white-space:nowrap;">選擇週：</label>
+                    <input type="week" name="week" value="<?= htmlspecialchars($selected_week) ?>" onchange="this.form.submit()" style="flex:1;padding:8px 12px;">
+                <?php else: ?>
+                    <label style="white-space:nowrap;">選擇日期：</label>
+                    <input type="date" name="date" value="<?= htmlspecialchars($selected_date) ?>" onchange="this.form.submit()" style="flex:1;padding:8px 12px;">
+                <?php endif; ?>
+            </div>
+        </form>
+    </div>
 
     <?php foreach ($stats as $dept => $list): ?>
         <h3 style="margin-top:2em;"><?= htmlspecialchars($dept) ?></h3>
