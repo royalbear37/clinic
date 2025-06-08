@@ -12,6 +12,7 @@ include("../header.php");
         <li><a href="/clinic/notifications/notifications_generate.php">📂 產生明日預約通知</a></li>
         <li><a href="/clinic/appointment/auto_noshow.php">📋 未到管理</a></li>
         <li><a href="/clinic/admins/doctor_substitute.php">🏥 醫師請假與代班</a></li>
+        <li><a href="/clinic/admins/appointments_monitor.php">📋 查看所有預約</a></li>
     </ul>
     <h3>📊 管理員報表</h3>
     <ul class="dashboard-menu">

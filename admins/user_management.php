@@ -40,6 +40,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_doctor_id'], $
     $stmt_update->execute();
 }
 
+// 新增醫師處理
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_doctor'])) {
+    $name = trim($_POST['name']);
+    $user_id = trim($_POST['user_id']);
+    $id_number = trim($_POST['id_number']);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $department_id = intval($_POST['department_id']);
+
+    // 先寫入 users
+    $stmt = $conn->prepare("INSERT INTO users (user_id, name, id_number, password, role, created_at) VALUES (?, ?, ?, ?, 'doctor', NOW())");
+    $stmt->bind_param("ssss", $user_id, $name, $id_number, $password);
+    if ($stmt->execute()) {
+        $uid = $conn->insert_id;
+        // 再寫入 doctors
+        $stmt2 = $conn->prepare("INSERT INTO doctors (user_id, department_id) VALUES (?, ?)");
+        $stmt2->bind_param("ii", $uid, $department_id);
+        $stmt2->execute();
+        echo "<script>alert('新增醫師成功！');location.href=location.href;</script>";
+        exit;
+    } else {
+        echo "<div style='color:red;'>新增失敗，帳號可能重複。</div>";
+    }
+}
+
+// 取得所有科別
+$dept_res = $conn->query("SELECT department_id, name FROM departments ORDER BY department_id");
+$departments = [];
+while ($row = $dept_res->fetch_assoc()) {
+    $departments[] = $row;
+}
+
 // 搜尋 + 篩選
 $search = $_GET['search'] ?? '';
 $filter_role = $_GET['role'] ?? '';
@@ -171,6 +202,25 @@ $result = $stmt->get_result();
         <?php endif; ?>
     <?php endwhile; ?>
 </table>
+
+<!-- 新增醫師表單 -->
+<div style="margin-bottom:24px;">
+    <form method="post" style="display:inline-block;padding:18px 28px;background:#f7f7f7;border-radius:10px;box-shadow:0 2px 8px #eee;">
+        <input type="hidden" name="add_doctor" value="1">
+        <b>新增醫師：</b>
+        <input type="text" name="name" placeholder="姓名" required style="width:90px;">
+        <input type="text" name="user_id" placeholder="帳號" required style="width:90px;">
+        <input type="text" name="id_number" placeholder="身分證" required style="width:110px;">
+        <input type="password" name="password" placeholder="密碼" required style="width:90px;">
+        <select name="department_id" required>
+            <option value="">請選科別</option>
+            <?php foreach ($departments as $dept): ?>
+                <option value="<?= $dept['department_id'] ?>"><?= htmlspecialchars($dept['name']) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <button type="submit" style="background:#2563eb;color:#fff;padding:6px 18px;border-radius:6px;border:none;">➕ 新增</button>
+    </form>
+</div>
 
 <p><a href="/clinic/admins/dashboard.php">🔙 回到主頁</a></p>
 </div>
