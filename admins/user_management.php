@@ -76,14 +76,18 @@ $result = $stmt->get_result();
 <h2>👤 使用者管理（含醫師簡介編輯）</h2>
 
 <form method="get" style="margin-bottom: 15px;">
-    搜尋：<input type="text" name="search" value="<?= htmlspecialchars($search) ?>">
-    角色：
-    <select name="role">
-        <option value="">全部</option>
-        <option value="admin" <?= $filter_role === 'admin' ? 'selected' : '' ?>>管理員</option>
-        <option value="doctor" <?= $filter_role === 'doctor' ? 'selected' : '' ?>>醫師</option>
-        <option value="patient" <?= $filter_role === 'patient' ? 'selected' : '' ?>>病患</option>
-    </select>
+    <div style="margin-bottom:8px;">
+        搜尋：<input type="text" name="search" value="<?= htmlspecialchars($search) ?>">
+    </div>
+    <div style="margin-bottom:8px;">
+        用戶：
+        <select name="role">
+            <option value="">全部</option>
+            <option value="admin" <?= $filter_role === 'admin' ? 'selected' : '' ?>>管理員</option>
+            <option value="doctor" <?= $filter_role === 'doctor' ? 'selected' : '' ?>>醫師</option>
+            <option value="patient" <?= $filter_role === 'patient' ? 'selected' : '' ?>>病患</option>
+        </select>
+    </div>
     <button type="submit">🔍 查詢</button>
 </form>
 
