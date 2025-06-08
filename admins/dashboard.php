@@ -20,7 +20,7 @@ include("../header.php");
         <li><a href="/clinic/report/report_doctors.php">🩺 醫師看診狀況</a></li>
         <li><a href="/clinic/report/report_patients.php">👤 病患紀錄分析</a></li>
         <li><a href="/clinic/report/report_feedback.php">🌟 滿意度與評價</a></li>
+        <li><a href="/clinic/users/logout.php" class="btn btn-danger w-100 mt-3">🚪 登出</a></li>
     </ul>
-    <a href="/clinic/users/logout.php" class="btn btn-danger w-100 mt-3">🚪 登出</a>
 </div>
 <?php include("../footer.php"); ?>

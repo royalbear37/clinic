@@ -1,11 +1,9 @@
 <?php
 include("../config/mysql_connect.inc.php");
 
-// 現在時間
-date_default_timezone_set('Asia/Taipei'); // 或改為你的伺服器時區
+date_default_timezone_set('Asia/Taipei');
 $now = new DateTime();
 
-// 查詢今天以前或今天的未報到預約
 $sql = "SELECT appointment_id, appointment_date, time_slot
         FROM appointments
         WHERE status = 'scheduled' AND appointment_date <= CURDATE()";
@@ -24,6 +22,16 @@ while ($row = $result->fetch_assoc()) {
         $count++;
     }
 }
-
-echo "✅ 本輪執行，自動標記 no-show：{$count} 筆。\n";
 ?>
+
+<?php include("../header.php"); ?>
+<link rel="stylesheet" href="/clinic/style.css">
+
+<div class="dashboard" style="max-width:600px;margin:40px auto;">
+    <h2 style="text-align:center;">⏰ 自動標記未到（no-show）</h2>
+    <div style="text-align:center;font-size:1.2em;margin-top:30px;">
+        ✅ 本輪執行，自動標記 no-show：<?= $count ?> 筆。
+    </div>
+</div>
+
+<?php include("../footer.php"); ?>
