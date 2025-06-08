@@ -142,7 +142,9 @@ $shift_names = [
                             echo "<td>";
                             if (isset($schedule[$shift_key][$dept_id][$date])) {
                                 foreach ($schedule[$shift_key][$dept_id][$date] as $doc) {
-                                    echo "<b>" . htmlspecialchars($doc['doctor_name']) . "</b><br>";
+                                    // intro.php 需要 dep=科別id&doctor_id=醫師id
+                                    $intro_url = "/clinic/doctors/intro.php?dep={$dept_id}}";
+                                    echo "<b><a href='{$intro_url}' style='color:#337ab7;text-decoration:underline;' target='_blank'>" . htmlspecialchars($doc['doctor_name']) . "</a></b><br>";
                                     if (!empty($doc['note'])) {
                                         echo "<span style='color:#888;font-size:0.9em;'>" . htmlspecialchars($doc['note']) . "</span><br>";
                                     }
