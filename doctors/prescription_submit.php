@@ -10,13 +10,16 @@ if (!isset($_SESSION['uid']) || $_SESSION['role'] !== 'doctor') {
 $appointment_id = $_POST['appointment_id'];
 $patient_id = $_POST['patient_id'];
 $doctor_id = $_SESSION['uid'];
-$medication = $_POST['medication'];
-$notes = $_POST['notes'];
+$notes = $_POST['notes'] ?? '';
 
-// 寫入資料
+// 將複選藥品組合成字串
+$medications = $_POST['medication'] ?? [];
+$medication_text = implode(", ", $medications);
+
+// 寫入處方資料
 $stmt = $conn->prepare("INSERT INTO prescriptions (appointment_id, doctor_id, patient_id, medication, notes)
                         VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("iiiss", $appointment_id, $doctor_id, $patient_id, $medication, $notes);
+$stmt->bind_param("iiiss", $appointment_id, $doctor_id, $patient_id, $medication_text, $notes);
 $stmt->execute();
 
 header("Location: dashboard.php?msg=prescribed");

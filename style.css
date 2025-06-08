@@ -535,7 +535,7 @@ form select {
 
 .appointment-actions .prescribe-button {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
   padding: 0.8em 1em;
   font-size: 1em;
   border: 1px solid var(--border);
@@ -549,4 +549,43 @@ form select {
 
 .appointment-actions .prescribe-button:hover {
   background-color: #449d44;
+}
+
+/* 新增底部選單樣式 */
+.dashboard-menu-bottom {
+  display: flex;
+  justify-content: center;
+  /* 由 space-between 改為 center */
+  align-items: center;
+  gap: 0.8em;
+  list-style: none;
+  padding: 0;
+  margin: 2.5em auto 0 auto;
+  max-width: 660px;
+  width: 100%;
+}
+
+.dashboard-menu-bottom li {
+  flex: 1 1 0;
+  max-width: 200px;
+  /* 與上方選單一致 */
+}
+
+.dashboard-menu-bottom a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 0.9em 1.2em;
+  background: linear-gradient(90deg, var(--primary) 0%, #4a5260 100%);
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 1em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+  width: 100%;
+  min-width: 160px;
+  max-width: 200px;
+  transition: background 0.3s, color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
