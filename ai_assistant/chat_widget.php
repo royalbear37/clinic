@@ -1,5 +1,95 @@
-<!-- ai_assistant/chat_widget.php -->
 <style>
+    :root {
+        --primary: #2d323a;
+        --accent: #d1b656;
+        --bg: #f9f7f4;
+        --card-bg: #fffefc;
+        --text: #1f252d;
+        --subtext: #6b6b76;
+        --border: #e2ded6;
+    }
+
+    /* 聊天浮動按鈕 */
+    #chat-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--accent);
+        color: white;
+        padding: 10px 16px;
+        font-size: 15px;
+        border-radius: 999px;
+        cursor: pointer;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 主聊天視窗 */
+    #chat-box {
+        display: none;
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 340px;
+        height: 480px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #chat-box .header {
+        background: var(--primary);
+        color: var(--accent);
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.05em;
+    }
+
+    #chat-log {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        background-color: var(--bg);
+    }
+
+    .input-row {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid var(--border);
+        gap: 6px;
+        background: var(--card-bg);
+    }
+
+    #chat-box input[type="text"] {
+        flex: 1;
+        border: 1px solid var(--border);
+        padding: 6px;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        color: var(--text);
+    }
+
+    #chat-box button {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    #chat-box button:hover {
+        background: #bca33f;
+    }
+
+    /* 對話訊息區塊 */
     .chat-entry {
         display: flex;
         align-items: flex-start;
@@ -24,104 +114,37 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        font-size: 12px;
-        color: #555;
+        font-size: 11px;
+        color: var(--subtext);
     }
 
     .chat-bubble {
         padding: 8px 12px;
-        background-color: #f1f1f1;
-        border-radius: 15px;
-        border-top-left-radius: 0;
+        border-radius: 16px;
         font-size: 14px;
+        line-height: 1.6;
     }
 
+    /* 使用者對話樣式（深灰藍） */
     .chat-user {
         align-self: flex-end;
         flex-direction: row-reverse;
     }
 
     .chat-user .chat-bubble {
-        background-color: #007bff;
+        background-color: var(--primary);
         color: white;
         border-top-right-radius: 0;
-        border-top-left-radius: 15px;
     }
 
-    #chat-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #007bff;
-        color: white;
-        padding: 10px 16px;
-        font-size: 15px;
-        border-radius: 999px;
-        cursor: pointer;
-        z-index: 9999;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    #chat-box {
-        display: none;
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 320px;
-        height: 450px;
-        background: white;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-        z-index: 9998;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    #chat-box .header {
-        background: #007bff;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    #chat-log {
-        flex: 1;
-        overflow-y: auto;
-        padding: 10px;
-        background-color: #f9f9f9;
-    }
-
-    .input-row {
-        display: flex;
-        padding: 10px;
-        border-top: 1px solid #ccc;
-        gap: 6px;
-    }
-
-    #chat-box input[type="text"] {
-        flex: 1;
-        border: 1px solid #ccc;
-        padding: 6px;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-
-    #chat-box button {
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    #chat-box button:hover {
-        background: #0056b3;
+    /* AI 回應樣式（偏亮金） */
+    .chat-entry:not(.chat-user) .chat-bubble {
+        background-color: #f5e5a2;
+        color: var(--text);
+        border-top-left-radius: 0;
     }
 </style>
+
 
 <div id="chat-btn">💬 聊天</div>
 <div id="chat-box">
