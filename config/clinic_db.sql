@@ -68,12 +68,10 @@ CREATE TABLE appointments (
   ),
   checkin_time DATETIME,
   substitute_doctor_id INT,
-  modified_by_admin_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
   FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id),
-  FOREIGN KEY (substitute_doctor_id) REFERENCES doctors(doctor_id),
-  FOREIGN KEY (modified_by_admin_id) REFERENCES admins(admin_id)
+  FOREIGN KEY (substitute_doctor_id) REFERENCES doctors(doctor_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 CREATE TABLE feedback (
   feedback_id INT AUTO_INCREMENT PRIMARY KEY,
