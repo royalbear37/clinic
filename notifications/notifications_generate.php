@@ -55,39 +55,46 @@ while ($row = $result->fetch_assoc()) {
 }
 ?>
 
-<h2>📩 明日預約通知產生（<?= $target_date ?>）</h2>
+<?php include("../header.php"); ?>
+<link rel="stylesheet" href="/clinic/style.css">
 
-<?php if (count($previews) === 0): ?>
-    <p>📭 明日沒有任何預約，無需發送通知。</p>
-<?php else: ?>
-    <h3>🔍 預覽：將通知以下病患</h3>
-    <table border="1" cellpadding="6">
-        <tr>
-            <th>病患姓名</th>
-            <th>預約時段</th>
-            <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
-                <th>通知狀態</th>
-            <?php endif; ?>
-        </tr>
-        <?php foreach ($previews as $i => $row): ?>
-            <tr>
-                <td><?= htmlspecialchars($row['patient_name']) ?></td>
-                <td><?= $row['time_slot'] ?></td>
+<div class="dashboard" style="max-width:700px;margin:40px auto;">
+    <h2 style="text-align:center;">📩 明日預約通知產生（<?= $target_date ?>）</h2>
+
+    <?php if (count($previews) === 0): ?>
+        <p>📭 明日沒有任何預約，無需發送通知。</p>
+    <?php else: ?>
+        <h3>🔍 預覽：將通知以下病患</h3>
+        <table class="table" style="width:100%;border-collapse:collapse;background:#fffdfa;">
+            <tr style="background: #f7f5f2; color: #23272f;">
+                <th>病患姓名</th>
+                <th>預約時段</th>
                 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
-                    <td><?= $records[$i]['status'] ?? '—' ?></td>
+                    <th>通知狀態</th>
                 <?php endif; ?>
             </tr>
-        <?php endforeach; ?>
-    </table>
-<?php endif; ?>
+            <?php foreach ($previews as $i => $row): ?>
+                <tr style="text-align:center;">
+                    <td><?= htmlspecialchars($row['patient_name']) ?></td>
+                    <td><?= htmlspecialchars($row['time_slot']) ?></td>
+                    <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+                        <td><?= $records[$i]['status'] ?? '—' ?></td>
+                    <?php endif; ?>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php endif; ?>
 
-<?php if ($_SERVER['REQUEST_METHOD'] !== 'POST' && count($previews) > 0): ?>
-    <form method="post" style="margin-top: 1em;">
-        <button type="submit">📩 確定發送通知（寫入資料庫）</button>
-    </form>
-<?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
-    <p>✅ 共新增通知 <?= $inserted ?> 筆。</p>
-    <p><a href="notifications_generate.php">🔁 返回重新查詢</a></p>
-<?php endif; ?>
+    <?php if ($_SERVER['REQUEST_METHOD'] !== 'POST' && count($previews) > 0): ?>
+        <form method="post" style="margin-top: 1em; text-align:center;">
+            <button class="button" type="submit">📩 確定發送通知（寫入資料庫）</button>
+        </form>
+    <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+        <p style="text-align:center;">✅ 共新增通知 <?= $inserted ?> 筆。</p>
+        <p style="text-align:center;"><a class="button" href="notifications_generate.php">🔁 返回重新查詢</a></p>
+    <?php endif; ?>
 
-<p><a href="/clinic/admins/dashboard.php">🔙 回到主頁</a></p>
+    <p style="text-align:center;"><a class="button" href="/clinic/admins/dashboard.php">🔙 回到主頁</a></p>
+</div>
+
+<?php include("../footer.php"); ?>

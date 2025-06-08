@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['schedule_id'], $_POST
             $time_slot = $app_row['time_slot'];
             $msg = "您的 $date $time_slot 門診已由 $sub_name 醫師代班。";
             $msg = $conn->real_escape_string($msg);
-            $type = 'substitute'; // 你可自訂通知類型
+            $type = 'email'; // 你可自訂通知類型
             if ($conn->query("INSERT INTO notifications (appointment_id, patient_id, type, message, sent_at) VALUES ($appointment_id, $patient_id, '$type', '$msg', NOW())")) {
                 $notify_success++;
             }
