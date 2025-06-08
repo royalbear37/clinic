@@ -28,7 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 session_start();
                 if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     if (!isset($_POST['captcha_input']) || $_POST['captcha_input'] !== $_SESSION['captcha']) {
-                        die("❌ 驗證碼錯誤，請重新輸入。");
+                        echo "<script>alert('❌ 驗證碼錯誤，請重新輸入。'); history.back();</script>";
+                        exit();
                     }
 
                     // ...這裡才是驗證帳號密碼的邏輯

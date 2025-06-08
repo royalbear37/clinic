@@ -31,10 +31,49 @@ if ($res->num_rows === 0) {
 $now = date('Y-m-d H:i:s');
 $stmt = $conn->prepare("UPDATE appointments SET status = 'checked_in', checkin_time = ? WHERE appointment_id = ?");
 $stmt->bind_param("si", $now, $appointment_id);
-if ($stmt->execute()) {
-    echo "✅ 報到成功！";
-} else {
-    echo "❌ 報到失敗：" . $stmt->error;
-}
+// ✅ 改這裡：先執行完 UPDATE 再跳出 PHP 模式
+$checkin_success = $stmt->execute();
+?>
 
-echo "<br><a href='my_appointment.php'>🔙 返回預約列表</a>";
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>報到結果</title>
+    <link rel="stylesheet" href="/clinic/style.css">
+    <style>
+        .checkin-result {
+            max-width: 500px;
+            margin: 80px auto;
+            padding: 2em;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .checkin-result a {
+            display: inline-block;
+            margin-top: 1.5em;
+            font-weight: bold;
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="checkin-result">
+        <?php if ($checkin_success): ?>
+            ✅ 報到成功！
+        <?php else: ?>
+            ❌ 報到失敗：<?= $stmt->error ?>
+        <?php endif; ?>
+        <br>
+        <a href='my_appointment.php'>🔙 返回預約列表</a>
+    </div>
+</body>
+
+</html>
