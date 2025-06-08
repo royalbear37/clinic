@@ -29,7 +29,8 @@ VALUES (101, '眼科'),
   (102, '耳鼻喉科'),
   (103, '小兒科'),
   (104, '皮膚科'),
-  (105, '骨科');
+  (105, '骨科'),
+  (106, '其他服務');
 CREATE TABLE doctors (
   doctor_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -57,7 +58,8 @@ CREATE TABLE appointments (
     'consultation',
     'checkup',
     'follow_up',
-    'emergency'
+    'emergency',
+    'vaccination'
   ),
   status ENUM(
     'scheduled',

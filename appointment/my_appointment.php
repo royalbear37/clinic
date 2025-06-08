@@ -21,11 +21,15 @@ if (!$row) {
 }
 $patient_id = $row['patient_id'];
 
-$sql = "SELECT a.*, u.name AS doctor_name, d.name AS department, p.medication, p.notes
+$sql = "SELECT a.*, 
+        u.name AS doctor_name, 
+        -- 若為疫苗注射則顯示'其他服務'，否則顯示科別名稱
+        CASE WHEN a.service_type = 'vaccination' THEN '其他服務' ELSE d.name END AS department,
+        p.medication, p.notes
         FROM appointments a
-        JOIN doctors doc ON a.doctor_id = doc.doctor_id
-        JOIN users u ON doc.user_id = u.id
-        JOIN departments d ON doc.department_id = d.department_id
+        LEFT JOIN doctors doc ON a.doctor_id = doc.doctor_id
+        LEFT JOIN users u ON doc.user_id = u.id
+        LEFT JOIN departments d ON doc.department_id = d.department_id
         LEFT JOIN prescriptions p ON a.appointment_id = p.appointment_id
         WHERE a.patient_id = ?
         ORDER BY a.appointment_date DESC, a.time_slot";
@@ -59,9 +63,25 @@ $result = $stmt->get_result();
                     <tr style="text-align:center;">
                         <td><?= htmlspecialchars($row['appointment_date']) ?></td>
                         <td><?= htmlspecialchars($row['time_slot']) ?></td>
-                        <td><?= htmlspecialchars($row['doctor_name']) ?></td>
-                        <td><?= htmlspecialchars($row['department']) ?></td>
-                        <td><?= htmlspecialchars($row['service_type']) ?></td>
+                        <td>
+                            <?= $row['service_type'] === 'vaccination' ? '-' : htmlspecialchars($row['doctor_name']) ?>
+                        </td>
+                        <td>
+                            <?= htmlspecialchars($row['department']) ?>
+                        </td>
+                        <td>
+                            <?php
+                            // 服務類型中文顯示
+                            switch ($row['service_type']) {
+                                case 'consultation': echo '一般諮詢'; break;
+                                case 'checkup': echo '健檢'; break;
+                                case 'follow_up': echo '回診'; break;
+                                case 'emergency': echo '急診'; break;
+                                case 'vaccination': echo '疫苗注射'; break;
+                                default: echo htmlspecialchars($row['service_type']);
+                            }
+                            ?>
+                        </td>
                         <td>
                             <?php
                             if ($row['status'] === 'scheduled') echo '<span style="color:#227d3b;">預約中</span>';

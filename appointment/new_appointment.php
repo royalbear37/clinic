@@ -96,7 +96,7 @@ $time_slots = generateTimeSlots();
         </div>
         <div class="form-group">
             <label>服務類型：</label>
-            <select name="service_type" required>
+            <select name="service_type" id="service_type_select" required>
                 <option value="consultation">一般諮詢</option>
                 <option value="checkup">健檢</option>
                 <option value="follow_up">回診</option>
@@ -195,10 +195,74 @@ $time_slots = generateTimeSlots();
 
 
 
+    // 服務類型選單動態切換
+    const serviceTypeSelect = document.getElementById("service_type_select");
+const deptSelect = document.getElementById("dept_select");
+const doctorGroup = document.getElementById("doctor_select").closest(".form-group");
+const doctorSelect = document.getElementById("doctor_select");
+const defaultServiceOptions = [
+    {value: "consultation", text: "一般諮詢"},
+    {value: "checkup", text: "健檢"},
+    {value: "follow_up", text: "回診"},
+    {value: "emergency", text: "急診"}
+];
+const vaccineOption = {value: "vaccination", text: "疫苗注射"};
+const otherDeptId = "106";
+
+function updateServiceTypeAndDoctorField() {
+    if (deptSelect.value === otherDeptId) {
+        // 只顯示疫苗注射
+        serviceTypeSelect.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = vaccineOption.value;
+        option.text = vaccineOption.text;
+        serviceTypeSelect.appendChild(option);
+
+        // 隱藏醫師欄位
+        doctorGroup.style.display = "none";
+        doctorSelect.required = false;
+        doctorSelect.value = "";
+    } else {
+        // 顯示一般服務類型
+        serviceTypeSelect.innerHTML = "";
+        defaultServiceOptions.forEach(opt => {
+            const option = document.createElement("option");
+            option.value = opt.value;
+            option.text = opt.text;
+            serviceTypeSelect.appendChild(option);
+        });
+
+        // 顯示醫師欄位
+        doctorGroup.style.display = "";
+        doctorSelect.required = true;
+    }
+}
+
+deptSelect.addEventListener("change", updateServiceTypeAndDoctorField);
+window.addEventListener("DOMContentLoaded", updateServiceTypeAndDoctorField);
     document.getElementById("dept_select").addEventListener("change", fetchDoctors);
     document.querySelector("input[name='appointment_date']").addEventListener("change", fetchDoctors);
     document.getElementById("time_slot_select").addEventListener("change", fetchDoctors);
     window.addEventListener("load", fetchDoctors);
+
+    function toggleDoctorField() {
+        const serviceType = serviceTypeSelect.value;
+        const doctorGroup = document.getElementById("doctor_select").closest(".form-group");
+        const doctorSelect = document.getElementById("doctor_select");
+        if (serviceType === "vaccination") {
+            doctorGroup.style.display = "none";
+            doctorSelect.required = false;
+            doctorSelect.value = "";
+        } else {
+            doctorGroup.style.display = "";
+            doctorSelect.required = true;
+        }
+    }
+
+    // 監聽服務類型選擇變化
+    serviceTypeSelect.addEventListener("change", toggleDoctorField);
+    // 初始化時也執行一次
+    window.addEventListener("DOMContentLoaded", toggleDoctorField);
 </script>
 
 <?php include("../footer.php"); ?>
