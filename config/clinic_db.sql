@@ -66,6 +66,7 @@ CREATE TABLE appointments (
     'completed',
     'no-show'
   ),
+  visit_number INT DEFAULT NULL, -- 新增這一行
   checkin_time DATETIME,
   substitute_doctor_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

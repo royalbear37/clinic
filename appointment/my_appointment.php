@@ -50,6 +50,7 @@ $result = $stmt->get_result();
                     <th>科別</th>
                     <th>服務類型</th>
                     <th>狀態</th>
+                    <th>看診序號</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -71,6 +72,7 @@ $result = $stmt->get_result();
                             else echo htmlspecialchars($row['status']);
                             ?>
                         </td>
+                        <td><?= htmlspecialchars($row['visit_number']) ?></td>
                         <td>
                             <?php if ($row['status'] === 'scheduled'): ?>
                                 <a href="appointment_checkin.php?id=<?= $row['appointment_id'] ?>" class="button" style="padding:0.3em 1em;font-size:0.95em;background:#337ab7;" onclick="return confirm('確定要報到嗎？');">報到</a>
