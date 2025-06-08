@@ -34,15 +34,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!$leave_date || !$shift) {
         $message = "❌ 請選擇請假日期與班別。";
     } else {
-        // 可加上避免重複插入（doctor_id, date, shift）邏輯
-        $stmt = $conn->prepare("INSERT INTO schedules (doctor_id, schedule_date, shift, is_available, note)
-                                VALUES (?, ?, ?, 0, ?)");
-        $stmt->bind_param("isss", $doctor_id, $leave_date, $shift, $reason);
-        if ($stmt->execute()) {
+        // 直接更新原本 schedule 的 is_available 為 0，並寫入請假原因
+        $stmt = $conn->prepare("UPDATE schedules SET is_available = 0, note = ? WHERE doctor_id = ? AND schedule_date = ? AND shift = ?");
+        $stmt->bind_param("siss", $reason, $doctor_id, $leave_date, $shift);
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
             $label = $shifts[$shift] ?? $shift;
             $message = "✅ 已登記請假：{$leave_date}（{$label}）";
         } else {
-            $message = "❌ 登記失敗：" . $stmt->error;
+            $message = "❌ 登記失敗：找不到對應的排班或已請假";
         }
     }
 }
