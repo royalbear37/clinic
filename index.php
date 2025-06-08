@@ -1,5 +1,5 @@
 <?php include("header.php"); ?>
-
+<?php include("ai_assistant/chat_widget.php"); ?>
 <div class="dashboard" style="text-align:center;">
 
     <div style="font-size:3.5em; margin-bottom:0.5em;">🩺</div>

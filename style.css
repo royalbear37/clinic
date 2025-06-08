@@ -71,7 +71,8 @@ body {
 header {
   background: var(--primary);
   color: var(--accent);
-  padding: 2.2em 3em; /* 可視需要加大padding */
+  padding: 2.2em 3em;
+  /* 可視需要加大padding */
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   box-shadow: 0 4px 16px rgba(34, 35, 43, 0.1);
@@ -81,7 +82,8 @@ header {
 }
 
 header h1 {
-  font-size: 2.6em;   /* 原本是2em，調大 */
+  font-size: 2.6em;
+  /* 原本是2em，調大 */
   font-weight: 700;
   letter-spacing: 1px;
   margin-bottom: 0.4em;
@@ -89,8 +91,10 @@ header h1 {
   text-shadow: 0 2px 6px rgba(209, 182, 86, 0.2);
 }
 
-header h2, header h3 {
-  font-size: 1.5em; /* 若有副標題也同步調大 */
+header h2,
+header h3 {
+  font-size: 1.5em;
+  /* 若有副標題也同步調大 */
 }
 
 .nav-bar {
@@ -428,4 +432,73 @@ a:hover {
   margin: 0;
   min-width: 90px;
   font-size: 0.95em;
+}
+
+/* 🔧 登入欄位統一大小 */
+.login-wrapper form input,
+.login-wrapper form select,
+.login-wrapper form button {
+  width: 100%;
+  max-width: 420px;
+  height: 48px;
+  font-size: 1.05em;
+  padding: 0 1em;
+  border-radius: 10px;
+}
+
+/* 🔧 表單欄位上下間距更明顯 */
+.login-wrapper .form-group {
+  margin-bottom: 1.6em;
+}
+
+/* 🔧 驗證碼區塊：圖片與輸入框橫向排列 */
+.verification-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.verification-wrapper img {
+  height: 44px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 0px;
+  background: #fff;
+}
+
+/* 確保 input/select/textarea 是以 border-box 計算寬度 */
+form input,
+form select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  height: 48px;
+  padding: 0 1em;
+  font-size: 1.05em;
+  border-radius: 10px;
+}
+
+#login-button {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: 48px;
+  font-size: 1.05em;
+  border-radius: 10px;
+  text-align: center;
+  padding: 0;
+}
+
+#register-button {
+  display: inline-block;
+  margin-top: 0.6em;
+  font-size: 1.00em;
+  font-weight: 700;
+  padding: 0.6em 1.4em;
+  background: #f5f2ee;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  text-decoration: none;
+  /* transition: none; */
 }
