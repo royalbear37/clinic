@@ -47,7 +47,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['schedule_id'], $_POST
         error_log($sql_update_appointments);
         error_log('affected rows: ' . $conn->affected_rows);
 
-        echo "<script>alert('已指派代班醫師！');location.href='doctor_substitute.php';</script>";
+        // 查詢代班醫師姓名
+        $sub_sql = "SELECT u.name FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.doctor_id = $substitute_doctor_id";
+        $sub_res = $conn->query($sub_sql);
+        $sub_name = ($sub_res && $row = $sub_res->fetch_assoc()) ? $row['name'] : '代班醫師';
+
+        // 查詢所有受影響的預約（含 appointment_id 與 time_slot）
+        $sql_appointments = "SELECT appointment_id, patient_id, time_slot FROM appointments
+            WHERE doctor_id = $ori_doctor_id
+              AND appointment_date = '$date'
+              AND time_slot IN ($time_slots_str)";
+        $res_appointments = $conn->query($sql_appointments);
+
+        $notify_success = 0;
+        while ($app_row = $res_appointments->fetch_assoc()) {
+            $appointment_id = intval($app_row['appointment_id']);
+            $patient_id = intval($app_row['patient_id']);
+            $time_slot = $app_row['time_slot'];
+            $msg = "您的 $date $time_slot 門診已由 $sub_name 醫師代班。";
+            $msg = $conn->real_escape_string($msg);
+            $type = 'substitute'; // 你可自訂通知類型
+            if ($conn->query("INSERT INTO notifications (appointment_id, patient_id, type, message, sent_at) VALUES ($appointment_id, $patient_id, '$type', '$msg', NOW())")) {
+                $notify_success++;
+            }
+        }
+
+        if ($notify_success > 0) {
+            echo "<script>alert('已指派代班醫師並發送通知給病患！');location.href='doctor_substitute.php';</script>";
+        } else {
+            echo "<script>alert('已指派代班醫師，但通知發送失敗！');location.href='doctor_substitute.php';</script>";
+        }
         exit;
     }
 }
