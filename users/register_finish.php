@@ -21,9 +21,15 @@ if ($pw && $pw2 && $pw == $pw2) {
     // 自動產生 user_id
     $prefix = '';
     switch ($role) {
-        case 'patient': $prefix = 'PAT'; break;
-        case 'doctor':  $prefix = 'DOC'; break;
-        case 'admin':   $prefix = 'ADM'; break;
+        case 'patient':
+            $prefix = 'PAT';
+            break;
+        case 'doctor':
+            $prefix = 'DOC';
+            break;
+        case 'admin':
+            $prefix = 'ADM';
+            break;
         default:
             die('錯誤：角色無效');
     }
@@ -42,6 +48,7 @@ if ($pw && $pw2 && $pw == $pw2) {
 
     // 密碼雜湊
     $hash_pw = password_hash($pw, PASSWORD_DEFAULT);
+
 
     // 寫入 users 表
     $stmt = $conn->prepare("INSERT INTO users (user_id, id_number, password, role, name, email) VALUES (?, ?, ?, ?, ?, ?)");

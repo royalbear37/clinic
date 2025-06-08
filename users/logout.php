@@ -13,4 +13,3 @@ echo '<div class="success">您已成功登出，將返回登入頁面...</div>';
 echo '<meta http-equiv="REFRESH" content="1;url=login.php">';
 
 include("../footer.php"); // 加在最後面
-?>
