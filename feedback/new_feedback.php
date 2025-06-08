@@ -58,10 +58,12 @@ $result = $stmt->get_result();
             <label>留言建議（可選）：</label>
             <textarea name="comment" rows="4"></textarea>
         </div>
-        <button type="submit" class="button">送出回饋</button>
+        <div style="text-align:center;">
+            <button type="submit" class="button">送出回饋</button>
+        </div>
     </form>
 
-    <form method="get" action="feedback_list.php" style="margin-top: 18px;">
+    <form method="get" action="feedback_list.php" style="margin-top: 18px; display: flex; justify-content: center;">
         <button type="submit" class="button" style="max-width:220px;">📋 查看歷史回饋</button>
     </form>
 

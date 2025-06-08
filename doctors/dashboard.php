@@ -14,6 +14,7 @@ include("../header.php");
         <li><a href="/clinic/feedback/feedback_list.php">📝 查看病患回饋</a></li>
         <li><a href="/clinic/doctors/leave_apply.php">🏖️ 請假申請</a></li>
         <li><a href="/clinic/schedule/schedule_overview.php">🗓️ 排班狀況總覽</a></li>
+        <li><a href="/clinic/appointment/progress.php">📋 查看今日看診進度</a></li>
         <li><a href="/clinic/users/logout.php">🚪 登出</a></li>
     </ul>
 </div>

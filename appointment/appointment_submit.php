@@ -50,7 +50,7 @@ if (!$patientRow) {
         if (!in_array($time_slot, $time_slots)) {
             $time_slots[] = $time_slot;
             // 重新排序
-            usort($time_slots, function($a, $b) {
+            usort($time_slots, function ($a, $b) {
                 $a_time = strtotime(explode('-', $a)[0]);
                 $b_time = strtotime(explode('-', $b)[0]);
                 return $a_time - $b_time;

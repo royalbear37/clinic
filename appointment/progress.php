@@ -76,29 +76,80 @@ while ($row = $result->fetch_assoc()) {
 }
 ?>
 
-<h2>👩‍⚕️ <?= htmlspecialchars($time_slot) ?> 看診進度</h2>
-<p>✅ 已完成：<?= $completed ?> 人</p>
-<p>⚡️ 等候中：<?= $waiting ?> 人</p>
-<?php if ($role === 'doctor'): ?>
-    <p>🔁 下一位病患：<?= $next_patient['patient_name'] ?? '無' ?></p>
-<?php elseif ($role === 'patient'): ?>
-    <p>🧰 您目前排第 <?= $position ?> 位</p>
-<?php endif; ?>
+<link rel="stylesheet" href="/clinic/style.css">
 
-<h3 style="margin-top:2em;">📅 今日 <?= htmlspecialchars($time_slot) ?> 預約列表</h3>
-<table border="1" cellpadding="6">
-    <tr>
-        <th>病患姓名</th>
-        <th>狀態</th>
-        <th>報到時間</th>
-    </tr>
-    <?php foreach ($patients as $p): ?>
+<div class="dashboard" style="max-width:600px;margin:40px auto;">
+    <h2 style="text-align:center;">👩‍⚕️ <?= htmlspecialchars($time_slot) ?> 看診進度</h2>
+    <div style="display:flex;justify-content:space-between;max-width:400px;margin:0 auto 1.5em auto;">
+        <span>✅ 已完成：<?= $completed ?> 人</span>
+        <span>⚡️ 等候中：<?= $waiting ?> 人</span>
+    </div>
+    <?php if ($role === 'doctor'): ?>
+        <p style="text-align:center;">🔁 下一位病患：<strong><?= $next_patient['patient_name'] ?? '無' ?></strong></p>
+    <?php elseif ($role === 'patient'): ?>
+        <p style="text-align:center;">
+            <span style="font-size:1.25em; font-weight:700;">您目前排第</span>
+            <strong style="color:#2b6cb0; font-size:1.5em; font-weight:bold;"><?= $position ?></strong>
+            <span style="font-size:1.25em; font-weight:700;">位</span>
+        </p>
+    <?php endif; ?>
+
+    <h3 style="margin-top:2em;text-align:center;">📅 今日 <?= htmlspecialchars($time_slot) ?> 預約列表</h3>
+    <table class="progress-table" style="margin:0 auto;">
         <tr>
-            <td><?= htmlspecialchars($p['patient_name']) ?></td>
-            <td><?= $p['status'] ?></td>
-            <td><?= $p['checkin_time'] ?? '—' ?></td>
+            <th>病患姓名</th>
+            <th>狀態</th>
+            <th>報到時間</th>
         </tr>
-    <?php endforeach; ?>
-</table>
+        <?php foreach ($patients as $p): ?>
+            <tr>
+                <td><?= htmlspecialchars($p['patient_name']) ?></td>
+                <td>
+                    <?php
+                    if ($p['status'] === 'scheduled') echo '<span style="color:#227d3b;">預約中</span>';
+                    elseif ($p['status'] === 'checked_in') echo '<span style="color:#2b6cb0;">已報到</span>';
+                    elseif ($p['status'] === 'completed') echo '<span style="color:#555;">已完成</span>';
+                    elseif ($p['status'] === 'no-show') echo '<span style="color:#a94442;">未到</span>';
+                    elseif ($p['status'] === 'cancelled') echo '<span style="color:#a94442;">已取消</span>';
+                    else echo htmlspecialchars($p['status']);
+                    ?>
+                </td>
+                <td><?= $p['checkin_time'] ?? '—' ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
 
-<p style="margin-top:2em;"><a href="/clinic/<?= $role === 'doctor' ? 'doctors' : 'patients' ?>/dashboard.php">🔙 回主頁</a></p>
+    <div style="text-align:center;margin-top:2em;">
+        <a href="/clinic/<?= $role === 'doctor' ? 'doctors' : 'patients' ?>/dashboard.php" class="button" style="max-width:200px;">🔙 回主頁</a>
+    </div>
+</div>
+
+<style>
+    .progress-table {
+        border-collapse: collapse;
+        width: 100%;
+        background: #fffdfa;
+        margin-top: 1em;
+        box-shadow: 0 2px 10px rgba(34, 35, 43, 0.06);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-table th,
+    .progress-table td {
+        border: 1px solid #e2ded6;
+        padding: 0.7em 1.2em;
+        text-align: center;
+        font-size: 1em;
+    }
+
+    .progress-table th {
+        background: #f5f2ee;
+        color: #2d323a;
+        font-weight: 600;
+    }
+
+    .progress-table tr:nth-child(even) {
+        background: #faf8f4;
+    }
+</style>
