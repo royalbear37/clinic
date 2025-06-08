@@ -21,11 +21,7 @@ if (!$row) {
 }
 $patient_id = $row['patient_id'];
 
-$sql = "SELECT a.*, 
-        u.name AS doctor_name, 
-        -- 若為疫苗注射則顯示'其他服務'，否則顯示科別名稱
-        CASE WHEN a.service_type = 'vaccination' THEN '其他服務' ELSE d.name END AS department,
-        p.medication, p.notes
+$sql = "SELECT a.*, u.name AS doctor_name, d.name AS department, p.medication, p.notes
         FROM appointments a
         LEFT JOIN doctors doc ON a.doctor_id = doc.doctor_id
         LEFT JOIN users u ON doc.user_id = u.id
@@ -64,10 +60,22 @@ $result = $stmt->get_result();
                         <td><?= htmlspecialchars($row['appointment_date']) ?></td>
                         <td><?= htmlspecialchars($row['time_slot']) ?></td>
                         <td>
-                            <?= $row['service_type'] === 'vaccination' ? '-' : htmlspecialchars($row['doctor_name']) ?>
+                            <?php
+                            if ($row['service_type'] === 'vaccination') {
+                                echo '-';
+                            } else {
+                                echo htmlspecialchars($row['doctor_name']);
+                            }
+                            ?>
                         </td>
                         <td>
-                            <?= htmlspecialchars($row['department']) ?>
+                            <?php
+                            if ($row['service_type'] === 'vaccination') {
+                                echo '其他服務';
+                            } else {
+                                echo htmlspecialchars($row['department']);
+                            }
+                            ?>
                         </td>
                         <td>
                             <?php
