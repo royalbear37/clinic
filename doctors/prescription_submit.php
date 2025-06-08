@@ -17,9 +17,28 @@ $medications = $_POST['medication'] ?? [];
 $medication_text = implode(", ", $medications);
 
 // 寫入處方資料
-$stmt = $conn->prepare("INSERT INTO prescriptions (appointment_id, doctor_id, patient_id, medication, notes)
-                        VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("iiiss", $appointment_id, $doctor_id, $patient_id, $medication_text, $notes);
+$check_sql = "SELECT * FROM prescriptions WHERE appointment_id = ?";
+$stmt = $conn->prepare($check_sql);
+$stmt->bind_param("i", $_POST['appointment_id']);
 $stmt->execute();
+$res = $stmt->get_result();
 
-header("Location: dashboard.php?msg=prescribed");
+$medication = implode(",", $_POST['medication'] ?? []);
+$notes = $_POST['notes'];
+
+if ($res->num_rows > 0) {
+    // UPDATE
+    $update = $conn->prepare("UPDATE prescriptions SET medication = ?, notes = ? WHERE appointment_id = ?");
+    $update->bind_param("ssi", $medication, $notes, $_POST['appointment_id']);
+    $update->execute();
+} else {
+    // INSERT
+    $insert = $conn->prepare("INSERT INTO prescriptions (appointment_id, patient_id, medication, notes) VALUES (?, ?, ?, ?)");
+    $insert->bind_param("iiss", $_POST['appointment_id'], $_POST['patient_id'], $medication, $notes);
+    $insert->execute();
+}
+if (($res->num_rows > 0 && $update) || ($res->num_rows == 0 && $insert)) {
+    echo "<script>alert('處方已成功提交！'); window.location.href='/clinic/appointment/appointments_upcoming.php';</script>";
+} else {
+    echo "<script>alert('提交處方時發生錯誤，請稍後再試。'); history.back();</script>";
+}
