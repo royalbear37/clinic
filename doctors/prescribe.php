@@ -22,13 +22,28 @@ $stmt->bind_param("i", $appointment_id);
 $stmt->execute();
 $res = $stmt->get_result();
 $appointment = $res->fetch_assoc();
+// 查詢是否已有處方
+$prescription_sql = "SELECT * FROM prescriptions WHERE appointment_id = ?";
+$stmt = $conn->prepare($prescription_sql);
+$stmt->bind_param("i", $appointment_id);
+$stmt->execute();
+$prescription_result = $stmt->get_result();
+$prescription = $prescription_result->fetch_assoc();
+
+$selected_meds = [];
+$existing_notes = '';
+
+if ($prescription) {
+    $selected_meds = explode(',', $prescription['medication']); // 例如：["Paracetamol", "Amlodipine"]
+    $existing_notes = $prescription['notes'];
+}
 
 if (!$appointment) {
     die("❌ 找不到預約資料");
 }
 
 // ✅ 限制只能對「已完成」的預約開藥
-if ($appointment['status'] !== '已完成') {
+if ($appointment['status'] !== 'completed') {
     echo "<script>
         alert('⚠️ 僅能對已完成的預約開立處方（目前狀態：" . addslashes($appointment['status']) . "）');
         history.back();
@@ -101,10 +116,12 @@ if ($appointment['status'] !== '已完成') {
                                 <tr>
                                     <td class="med-name"><?= htmlspecialchars($med['name']) ?></td>
                                     <td class="med-check">
-                                        <input type="checkbox" name="medication[]" value="<?= htmlspecialchars($med['name']) ?>">
+                                        <input type="checkbox" name="medication[]" value="<?= htmlspecialchars($med['name']) ?>"
+                                            <?= in_array($med['name'], $selected_meds) ? 'checked' : '' ?>>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
+
                         </tbody>
                     </table>
                 </div>
@@ -112,7 +129,7 @@ if ($appointment['status'] !== '已完成') {
 
                 <div class="form-group">
                     <label>備註：</label>
-                    <textarea name="notes" rows="3" style="width:100%; border: 1px solid var(--border); border-radius: 8px; padding: 0.6em;"></textarea>
+                    <textarea name="notes" rows="3" style="width:100%; ..."><?= htmlspecialchars($existing_notes) ?></textarea>
                 </div>
 
                 <div style="text-align:center;">
