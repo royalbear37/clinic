@@ -60,64 +60,75 @@ $result = $stmt->get_result();
 ?>
 
 <?php include("../header.php"); ?>
-<div class="dashboard" style="max-width:950px;margin:40px auto;">
+<div class="dashboard">
+
     <h2 style="text-align:center;">🗓 未來一個月內的預約紀錄</h2>
     <?php if (isset($msg)): ?>
         <p class="<?= $msg_type ?>"><?= $msg ?></p>
     <?php endif; ?>
     <div style="overflow-x:auto;">
-    <?php if ($result->num_rows === 0): ?>
-        <p>目前沒有預約。</p>
-    <?php else: ?>
-        <table style="width:100%;border-collapse:collapse;background:#fffdfa;">
-            <thead>
-                <tr style="background: #f7f5f2; color: #23272f;">
-                    <th>日期</th>
-                    <th>時段</th>
-                    <th>病患</th>
-                    <th>服務類型</th>
-                    <th>狀態</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <tr style="text-align:center;">
-                    <td><?= htmlspecialchars($row['appointment_date']) ?></td>
-                    <td><?= htmlspecialchars($row['time_slot']) ?></td>
-                    <td>
-                        <a href="patient_history.php?patient_id=<?= $row['patient_id'] ?>">
-                            <?= htmlspecialchars($row['patient_name']) ?>
-                        </a>
-                    </td>
-                    <td><?= htmlspecialchars($row['service_type']) ?></td>
-                    <td>
-                        <?php
-                            if ($row['status'] === 'scheduled') echo '<span style="color:#227d3b;">預約中</span>';
-                            elseif ($row['status'] === 'checked_in') echo '<span style="color:#2b6cb0;">已報到</span>';
-                            elseif ($row['status'] === 'completed') echo '<span style="color:#555;">已完成</span>';
-                            elseif ($row['status'] === 'no-show') echo '<span style="color:#a94442;">未到</span>';
-                            elseif ($row['status'] === 'cancelled') echo '<span style="color:#a94442;">已取消</span>';
-                            else echo htmlspecialchars($row['status']);
-                        ?>
-                    </td>
-                    <td>
-                        <form method="post" class="appointment-action-form">
-                            <input type="hidden" name="appointment_id" value="<?= $row['appointment_id'] ?>">
-                            <select name="new_status">
-                                <option value="checked_in" <?= $row['status'] === 'checked_in' ? 'selected' : '' ?>>✔️ 報到</option>
-                                <option value="completed" <?= $row['status'] === 'completed' ? 'selected' : '' ?>>✅ 完成</option>
-                                <option value="no-show" <?= $row['status'] === 'no-show' ? 'selected' : '' ?>>❌ 病患未到</option>
-                                <option value="cancelled" <?= $row['status'] === 'cancelled' ? 'selected' : '' ?>>❎ 取消</option>
-                            </select>
-                            <button type="submit" class="button" style="padding:0.3em 1em;font-size:0.95em;">更新</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
+        <?php if ($result->num_rows === 0): ?>
+            <p>目前沒有預約。</p>
+        <?php else: ?>
+            <table style="width:100%;border-collapse:collapse;background:#fffdfa;">
+                <thead>
+                    <tr style="background: #f7f5f2; color: #23272f;">
+                        <th>日期</th>
+                        <th>時段</th>
+                        <th>病患</th>
+                        <th>服務類型</th>
+                        <th>狀態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr style="text-align:center;">
+                            <td><?= htmlspecialchars($row['appointment_date']) ?></td>
+                            <td><?= htmlspecialchars($row['time_slot']) ?></td>
+                            <td>
+                                <a href="patient_history.php?patient_id=<?= $row['patient_id'] ?>">
+                                    <?= htmlspecialchars($row['patient_name']) ?>
+                                </a>
+                            </td>
+                            <td><?= htmlspecialchars($row['service_type']) ?></td>
+                            <td>
+                                <?php
+                                if ($row['status'] === 'scheduled') echo '<span style="color:#227d3b;">預約中</span>';
+                                elseif ($row['status'] === 'checked_in') echo '<span style="color:#2b6cb0;">已報到</span>';
+                                elseif ($row['status'] === 'completed') echo '<span style="color:#555;">已完成</span>';
+                                elseif ($row['status'] === 'no-show') echo '<span style="color:#a94442;">未到</span>';
+                                elseif ($row['status'] === 'cancelled') echo '<span style="color:#a94442;">已取消</span>';
+                                else echo htmlspecialchars($row['status']);
+                                ?>
+                            </td>
+                            <td>
+                                <div class="appointment-actions">
+                                    <form method="post" class="appointment-action-form">
+                                        <input type="hidden" name="appointment_id" value="<?= $row['appointment_id'] ?>">
+                                        <select name="new_status">
+                                            <option value="checked_in" <?= $row['status'] === 'checked_in' ? 'selected' : '' ?>>✔️ 報到</option>
+                                            <option value="completed" <?= $row['status'] === 'completed' ? 'selected' : '' ?>>✅ 完成</option>
+                                            <option value="no-show" <?= $row['status'] === 'no-show' ? 'selected' : '' ?>>❌ 未到</option>
+                                            <option value="cancelled" <?= $row['status'] === 'cancelled' ? 'selected' : '' ?>>❎ 取消</option>
+                                        </select>
+                                        <button type="submit" class="button">更新</button>
+                                        <button type="button"
+                                            class="prescribe-button"
+                                            onclick="window.location.href='/clinic/doctors/prescribe.php?id=<?= $row['appointment_id'] ?>'">
+                                            開藥
+                                        </button>
+
+                                    </form>
+                                </div>
+                            </td>
+
+
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
     </div>
     <div style="text-align:center; margin-top:2em;">
         <a href="/clinic/doctors/dashboard.php" class="button" style="max-width:200px;">🔙 回到主頁</a>

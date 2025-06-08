@@ -147,7 +147,7 @@ main {
 /* Dashboard 容器，優化間距與比例 */
 .dashboard {
   width: 90%;
-  max-width: 640px;
+  max-width: 2000px;
   background: var(--card-bg);
   margin: 40px auto;
   padding: 2em 2.5em;
@@ -294,6 +294,7 @@ form button:hover,
   transition: background 0.3s, color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
+
 .dashboard-menu a:hover {
   background: linear-gradient(90deg, var(--accent) 0%, #e7d17b 100%);
   transform: translateY(-2px);
@@ -308,6 +309,14 @@ form button:hover,
   transform: scale(1.1);
   /* 減輕動畫幅度 */
 }
+
+.appointment-action-form select {
+  min-width: 0px;
+  padding: 0.1em;
+  font-size: 0.95em;
+  text-align: center;
+}
+
 
 /* 狀態訊息 */
 .success,
@@ -501,4 +510,43 @@ form select {
   border-radius: 8px;
   text-decoration: none;
   /* transition: none; */
+}
+
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.appointment-actions .status-select {
+  min-width: 120px;
+  padding: 0.4em;
+  font-size: 0.95em;
+  text-align: center;
+}
+
+.appointment-actions .action-buttons {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 0.4em;
+  justify-content: center;
+}
+
+.appointment-actions .prescribe-button {
+  width: 100%;
+  max-width: 420px;
+  padding: 0.8em 1em;
+  font-size: 1em;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #5cb85c;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+
+
+.appointment-actions .prescribe-button:hover {
+  background-color: #449d44;
 }
