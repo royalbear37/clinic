@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['schedule_id'], $_POST
         $sub_sql = "SELECT u.name FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.doctor_id = $substitute_doctor_id";
         $sub_res = $conn->query($sub_sql);
         $sub_name = ($sub_res && $row = $sub_res->fetch_assoc()) ? $row['name'] : '代班醫師';
+        
 
         // 查詢所有受影響的預約（含 appointment_id 與 time_slot）
         $sql_appointments = "SELECT appointment_id, patient_id, time_slot FROM appointments
@@ -160,11 +161,19 @@ $result = $conn->query($sql);
                                 JOIN users u ON d.user_id = u.id
                                 WHERE d.department_id = $department_id
                                   AND d.doctor_id != $doctor_id
+                                  -- 排除該醫師當天該時段有請假
                                   AND d.doctor_id NOT IN (
                                       SELECT doctor_id FROM schedules
                                       WHERE schedule_date = '$date'
                                         AND shift = '$shift'
                                         AND is_available = 0
+                                  )
+                                  -- 排除該醫師當天該時段有上班
+                                  AND d.doctor_id NOT IN (
+                                      SELECT doctor_id FROM schedules
+                                      WHERE schedule_date = '$date'
+                                        AND shift = '$shift'
+                                        AND is_available = 1
                                   )
                             ";
                             $sub_result = $conn->query($sql_sub);

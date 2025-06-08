@@ -30,7 +30,7 @@ if ($type === 'weekly') {
     $period_label = $start_date . " ~ " . $end_date;
 }
 
-// 查詢醫師統計 + 使用率（分母為該醫師該區間所有上班時段數*3*2，並顯示可預約時段總數與可預約人數）
+// 查詢醫師統計 + 使用率（分母為該醫師該區間所有上班時段數*6*3，並顯示可預約時段總數與可預約人數）
 $sql = "
 SELECT 
     u.name AS doctor_name,
