@@ -11,7 +11,9 @@ $role = $_SESSION['role'];
 $uid = $_SESSION['uid'];
 $doctor_id = null;
 $patient_id = null;
-$time_slot = $_GET['slot'] ?? 'morning';
+
+// 取得目前選取的時段
+$selected_time_slot = $_GET['time_slot'] ?? '';
 
 if ($role === 'doctor') {
     // 醫師登入：查 doctor_id
@@ -32,7 +34,7 @@ if ($role === 'doctor') {
     if (!$pat) die("❌ 找不到病患資料");
     $patient_id = $pat['patient_id'];
 
-    // 查今天預約的 doctor_id
+    // 查今天預約的 doctor_id 和時段
     $stmt = $conn->prepare("SELECT doctor_id, time_slot FROM appointments WHERE patient_id = ? AND appointment_date = CURDATE()");
     $stmt->bind_param("i", $patient_id);
     $stmt->execute();
@@ -40,7 +42,20 @@ if ($role === 'doctor') {
     $app = $res->fetch_assoc();
     if (!$app) die("❌ 您今天沒有預約");
     $doctor_id = $app['doctor_id'];
-    $time_slot = $app['time_slot'];
+    if (!$selected_time_slot) $selected_time_slot = $app['time_slot'];
+}
+
+// 查詢今天該醫師所有有預約的時段
+$time_slots = [];
+$stmt = $conn->prepare("SELECT DISTINCT time_slot FROM appointments WHERE doctor_id = ? AND appointment_date = CURDATE() ORDER BY time_slot");
+$stmt->bind_param("i", $doctor_id);
+$stmt->execute();
+$res = $stmt->get_result();
+while ($row = $res->fetch_assoc()) {
+    $time_slots[] = $row['time_slot'];
+}
+if (!$selected_time_slot && count($time_slots)) {
+    $selected_time_slot = $time_slots[0];
 }
 
 // 查詢今日該時段的所有病患
@@ -53,7 +68,7 @@ $sql = "SELECT a.*, u.name AS patient_name
           AND a.time_slot = ?
         ORDER BY a.checkin_time IS NULL, a.checkin_time, a.appointment_id";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("is", $doctor_id, $time_slot);
+$stmt->bind_param("is", $doctor_id, $selected_time_slot);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -79,7 +94,18 @@ while ($row = $result->fetch_assoc()) {
 <link rel="stylesheet" href="/clinic/style.css">
 
 <div class="dashboard" style="max-width:600px;margin:40px auto;">
-    <h2 style="text-align:center;">👩‍⚕️ <?= htmlspecialchars($time_slot) ?> 看診進度</h2>
+    <h2 style="text-align:center;">👩‍⚕️ 看診進度</h2>
+    <!-- 新增時段選單 -->
+    <form method="get" style="text-align:center;margin-bottom:1.5em;">
+        <label for="time_slot">選擇時段：</label>
+        <select name="time_slot" id="time_slot" onchange="this.form.submit()" style="padding:6px 16px;">
+            <?php foreach ($time_slots as $slot): ?>
+                <option value="<?= htmlspecialchars($slot) ?>" <?= $selected_time_slot == $slot ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($slot) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </form>
     <div style="display:flex;justify-content:space-between;max-width:400px;margin:0 auto 1.5em auto;">
         <span>✅ 已完成：<?= $completed ?> 人</span>
         <span>⚡️ 等候中：<?= $waiting ?> 人</span>
@@ -88,7 +114,6 @@ while ($row = $result->fetch_assoc()) {
         <p style="text-align:center;">🔁 下一位病患：<strong><?= $next_patient['patient_name'] ?? '無' ?></strong></p>
     <?php elseif ($role === 'patient'): ?>
         <?php
-        // 找出自己今天的狀態
         $my_status = null;
         foreach ($patients as $p) {
             if ($p['patient_id'] == $patient_id) {
@@ -110,7 +135,7 @@ while ($row = $result->fetch_assoc()) {
         <?php endif; ?>
     <?php endif; ?>
 
-    <h3 style="margin-top:2em;text-align:center;">📅 今日 <?= htmlspecialchars($time_slot) ?> 預約列表</h3>
+    <h3 style="margin-top:2em;text-align:center;">📅 今日 <?= htmlspecialchars($selected_time_slot) ?> 預約列表</h3>
     <table class="progress-table" style="margin:0 auto;">
         <tr>
             <th>病患姓名</th>
