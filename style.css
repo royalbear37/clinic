@@ -462,7 +462,7 @@ a:hover {
   height: 44px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  padding: 4px;
+  padding: 0px;
   background: #fff;
 }
 
@@ -487,4 +487,18 @@ form select {
   border-radius: 10px;
   text-align: center;
   padding: 0;
+}
+
+#register-button {
+  display: inline-block;
+  margin-top: 0.6em;
+  font-size: 1.00em;
+  font-weight: 700;
+  padding: 0.6em 1.4em;
+  background: #f5f2ee;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  text-decoration: none;
+  /* transition: none; */
 }
