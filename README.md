@@ -14,4 +14,6 @@ clone到之前作業用的AppServ/www資料夾裡面
 打開你的：C:\AppServ\php7\php.ini
 ****
 搜尋：curl.cainfo
-請將curl.cainfo這一行修改為：curl.cainfo = "C:\AppServ\www\clinic\ai_assistant\cacert.pem"
+請將curl.cainfo這一行修改為：curl.cainfo = "C:\AppServ\www\clinic\ai_assistant\cacert.pem"(最前面冒號是註解，要刪掉)
+WIN+R搜尋services.msc，重啟appserv
+
