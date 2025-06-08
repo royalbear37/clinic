@@ -33,7 +33,6 @@ $specialty_keywords = [
     '兒子' => 103,
     '女兒' => 103,
     '兒童' => 103,
-    '肚子痛' => 103,
     // 皮膚科
     '皮膚' => 104,
     '濕疹' => 104,
@@ -71,14 +70,19 @@ if ($department_id !== null) {
     $stmt->execute();
     $res = $stmt->get_result();
 
-    $reply = "✅ 根據您的症狀，建議就診以下科別與醫師：\n\n";
+    $reply = "根據您的症狀，建議就診以下科別與醫師：\n";
+    $first = true;
     while ($row = $res->fetch_assoc()) {
+        if (!$first) {
+            $reply .= "-----------------------------------------\n";
+        }
         $reply .= "👨‍⚕️ 醫師姓名：{$row['doctor_name']}\n";
         $reply .= "🏥 科別：{$row['department_name']}\n";
-        $reply .= "📌 專長：{$row['profile']}\n\n";
+        $reply .= "📌 {$row['profile']}\n";
+        $first = false;
     }
 
-    sleep(3); // ⏳ 模擬 AI 思考延遲
+    sleep(2); // ⏳ 模擬 AI 思考延遲
     echo json_encode(["reply" => nl2br($reply)]);
     exit;
 }
@@ -90,7 +94,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'model' => 'gpt-3.5-turbo',
     'messages' => [
-        ['role' => 'system', 'content' => '你是醫院小幫手，幫助使用者了解門診、預約與科別。'],
+        ['role' => 'system', 'content' => '你是醫院小幫手，告訴使用者剛剛提出需要的服務我們醫院目前沒有適合的醫生，但你還是給於一些建議。'],
         ['role' => 'user', 'content' => $user_input]
     ]
 ]));
