@@ -9,6 +9,7 @@ include("../header.php");
         <li><a href="/clinic/appointment/my_appointment.php">📅 報到/預約紀錄</a></li>
         <li><a href="/clinic/feedback/new_feedback.php">💬 看診回饋</a></li>
         <li><a href="/clinic/patients/profile_edit.php">📝 個人資料修改</a></li>
+        <li><a href="/clinic/patients/browse_available.php">🔍 查看一周醫師空檔 </a></li>
         <li><a href="/clinic/users/logout.php">🚪 登出</a></li>
     </ul>
 </div>
