@@ -87,11 +87,27 @@ while ($row = $result->fetch_assoc()) {
     <?php if ($role === 'doctor'): ?>
         <p style="text-align:center;">🔁 下一位病患：<strong><?= $next_patient['patient_name'] ?? '無' ?></strong></p>
     <?php elseif ($role === 'patient'): ?>
-        <p style="text-align:center;">
-            <span style="font-size:1.25em; font-weight:700;">您目前排第</span>
-            <strong style="color:#2b6cb0; font-size:1.5em; font-weight:bold;"><?= $position ?></strong>
-            <span style="font-size:1.25em; font-weight:700;">位</span>
-        </p>
+        <?php
+        // 找出自己今天的狀態
+        $my_status = null;
+        foreach ($patients as $p) {
+            if ($p['patient_id'] == $patient_id) {
+                $my_status = $p['status'];
+                break;
+            }
+        }
+        ?>
+        <?php if ($my_status === 'completed'): ?>
+            <p style="text-align:center;">
+                <span style="font-size:1.25em; font-weight:700; color:#227d3b;">✅ 您已完成今日看診</span>
+            </p>
+        <?php else: ?>
+            <p style="text-align:center;">
+                <span style="font-size:1.25em; font-weight:700;"> 您目前排第</span>
+                <strong style="color:#2b6cb0; font-size:1.5em; font-weight:bold;"><?= $position ?></strong>
+                <span style="font-size:1.25em; font-weight:700;">位</span>
+            </p>
+        <?php endif; ?>
     <?php endif; ?>
 
     <h3 style="margin-top:2em;text-align:center;">📅 今日 <?= htmlspecialchars($time_slot) ?> 預約列表</h3>
