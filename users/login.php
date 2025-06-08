@@ -56,17 +56,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <div class="login-wrapper">
     <form method="post" action="login.php">
         <div class="form-group">
-            <label for="id_number">身分證號碼：</label>
+            <label for="id_number" style="font-size:1.2em; font-weight:bold;">身分證號碼：</label>
             <input type="text" name="id_number" id="id_number" required>
         </div>
 
         <div class="form-group">
-            <label for="pw">密碼：</label>
+            <label for="pw" style="font-size:1.2em; font-weight:bold;">密碼：</label>
             <input type="password" name="pw" id="pw" required>
         </div>
 
         <div class="form-group">
-            <label for="role">登入身份：</label>
+            <label for="role" style="font-size:1.2em; font-weight:bold;">登入身份：</label>
             <select name="role" id="role" required>
                 <option value="patient">病患</option>
                 <option value="doctor">醫師</option>
@@ -75,10 +75,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div class="form-group">
-            <label for="captcha_input">驗證碼：</label>
+            <label for="captcha_input" style="font-size:1.2em; font-weight:bold;">驗證碼：</label>
             <div class="verification-wrapper">
                 <img src="captcha.php" alt="驗證碼圖片">
-                <input type="text" name="captcha_input" id="captcha_input" required placeholder="請輸入上方驗證碼">
+                <input type="text" name="captcha_input" id="captcha_input" required placeholder="請輸入左方驗證碼">
             </div>
         </div>
 
@@ -89,7 +89,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </div>
 
 
-<p>還沒有帳號？<a href="register.php">註冊</a></p>
+<p style="text-align: center;">
+    <span style="font-size: 1.2em; font-weight: bold;">還沒有帳號？</span>
+    <a href="register.php" class="button" id="register-button">註冊</a>
+</p>
+
 
 <?php include("../footer.php"); // 新增這行 
 ?>
