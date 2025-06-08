@@ -108,7 +108,7 @@ VALUES (
     'doc101',
     'A123456789',
     '$2y$10$PDSbrnBI0HB2Ac4oQcIYy.XmAzBtwCC0R.X.mLqzpUxYGJNC9TR5m',
-    'doctomor',
+    'doctor',
     '林小芳',
     'doc101@example.c'
   ),
