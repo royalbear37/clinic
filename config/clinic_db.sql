@@ -104,7 +104,7 @@ CREATE TABLE notifications (
 
 -- 預設醫生 user
 INSERT INTO users (user_id, id_number, password, role, name, email) VALUES
-('doc101', 'A123456789', 'password1', 'doctomor', '林小芳', 'doc101@example.c'),
+('doc101', 'A123456789', 'password1', 'doctor', '林小芳', 'doc101@example.c'),
 ('doc102', 'B123456789', 'password2', 'doctor', '李小華', 'doc102@example.com'),
 ('doc103', 'C123456789', 'password3', 'doctor', '陳美麗', 'doc103@example.com'),
 ('doc104', 'D123456789', 'password4', 'doctor', '張志強', 'doc104@example.com'),
