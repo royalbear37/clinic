@@ -18,6 +18,35 @@ $id_number = $_POST['id_number'];
 $role = $_POST['role']; // 'admin', 'doctor', 'patient'
 
 if ($pw && $pw2 && $pw == $pw2) {
+    // 檢查同一角色是否已存在相同的身分證字號
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM users WHERE id_number = ? AND role = ?");
+    if (!$stmt) die("prepare 錯誤：" . $conn->error);
+    $stmt->bind_param("ss", $id_number, $role);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row['count'] > 0) {
+        // 將角色英文轉換為中文名稱
+        $role_name = '';
+        switch ($role) {
+            case 'patient':
+                $role_name = '病患';
+                break;
+            case 'doctor':
+                $role_name = '醫師';
+                break;
+            case 'admin':
+                $role_name = '管理員';
+                break;
+            default:
+                $role_name = '未知角色';
+        }
+
+        echo "<div class='error' style='background:#ffe6e6;padding:12px;border-radius:8px;color:#a94442;font-size:1.2em;text-align:center;'>❌ 此身分證字號已註冊為 <b>$role_name</b>，請使用其他身分證字號。</div>";
+        echo '<meta http-equiv=REFRESH CONTENT=3;url=register.php>';
+        exit();
+    }
+
     // 自動產生 user_id
     $prefix = '';
     switch ($role) {
@@ -48,7 +77,6 @@ if ($pw && $pw2 && $pw == $pw2) {
 
     // 密碼雜湊
     $hash_pw = password_hash($pw, PASSWORD_DEFAULT);
-
 
     // 寫入 users 表
     $stmt = $conn->prepare("INSERT INTO users (user_id, id_number, password, role, name, email) VALUES (?, ?, ?, ?, ?, ?)");
