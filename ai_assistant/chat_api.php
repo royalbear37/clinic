@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 header("Content-Type: application/json");
 include("../config/mysql_connect.inc.php");
 
-$API_KEY = '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'; // ✅ 你自己的金鑰
+$API_KEY = ''; // ✅ 你自己的金鑰
 $data = json_decode(file_get_contents("php://input"), true);
 $user_input = $data['message'] ?? '';
 
